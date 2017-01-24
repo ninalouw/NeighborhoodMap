@@ -1,0 +1,23 @@
+{
+  "name": "neighborhood_map_project",
+  "version": "1.0.0",
+  "description": "A SAP built for Udacity frontend nanodegree.",
+  "main": "index.js",
+  "dependencies": {
+    "knockout": "^3.4.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ninalouw/NeighborhoodMap.git"
+  },
+  "author": "Nina Louw",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ninalouw/NeighborhoodMap/issues"
+  },
+  "homepage": "https://github.com/ninalouw/NeighborhoodMap#readme"
+}
