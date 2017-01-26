@@ -292,10 +292,14 @@ function populateInfoWindow(marker, infowindow){
 
 
 
-    function getYelpReviews(data, status){
+    function getYelpReviews () {
+      var yelpReviewsArray = ViewModel.yelpReviews();
       if (yelpReviewsArray.length > 0) {
+
           infowindow.setContent(`<div>&nbsp${marker.title}</div><br><div id='yelp-review' ><h1>Yelp Review</h1> </div>`);
-          var review = new Yelp(document.getElementById('yelp-review'));
+
+          // var review = new Yelp(document.getElementById('yelp-review'));
+
         } else {
         infowindow.setContent(`<div>&nbsp${marker.title}</div><div>No Yelp review found</div>`);
       }
@@ -307,10 +311,17 @@ function populateInfoWindow(marker, infowindow){
 
 //Yelp API authentication
 var yelpAuth = {
-  //put keys here
-
-
-}
+    //put keys here
+    consumerKey: '',
+    consumerSecret: '',
+    accessToken: '',
+    //Udacity specified that we should put our keys in our app, although in
+    //reality this would not be done
+    accessTokenSecret: '',
+    serviceProvider: {
+        signatureMethod: 'HMAC-SHA1'
+    }
+};
 
 //Knockout implementation
 
