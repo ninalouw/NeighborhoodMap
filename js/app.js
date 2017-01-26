@@ -277,19 +277,77 @@ function showListings(){
     map.fitBounds(bounds);
 }
 
-//Knockout implementation
+//YELP API
 
-//Place model
-var Place = function () {
+//populate info window when marker is clicked
+function populateInfoWindow(marker, infowindow){
+  if (infowindow.marker != marker) {
+    infowindow.setContent('');
+    infowindow.marker = marker;
+    //make sure marker property is cleared if infowindow closed
+    infowindow.addListener('closeclick', function(){
+      infowindow.marker = null;
+    });
+    //define Yelp review here/call it
 
-};
 
-function ViewModel(){
-    var self = this;
-    self.defaultMarkers = ko.observableArray([]);
+
+    function getYelpReviews(data, status){
+      if (yelpReviewsArray.length > 0) {
+          infowindow.setContent(`<div>&nbsp${marker.title}</div><br><div id='yelp-review' ><h1>Yelp Review</h1> </div>`);
+          var review = new Yelp(document.getElementById('yelp-review'));
+        } else {
+        infowindow.setContent(`<div>&nbsp${marker.title}</div><div>No Yelp review found</div>`);
+      }
+    }
+    //open infowindow on correct marker
+    infowindow.open(map, marker);
+  }
+}
+
+//Yelp API authentication
+var yelpAuth = {
+  //put keys here
+
 
 }
 
-var viewModel = new ViewModel();
+//Knockout implementation
+
+//Model for Yelp Reviews
+var YelpReview = function (){
+    var self = this;
+
+    self.imageUrl = '';
+    self.name = '';
+    self.rating = '';
+    self.ratingImgUrl = '';
+    self.reviewCount = '';
+    self.url = '';
+
+    self.buildReview = function() {
+        var yelpReview = '';
+        yelpReview += `<div class="yelp-review">`;
+        yelpReview += `<img src="${self.imageUrl}"><br>`
+        yelpReview += `<p>${self.name}</p>`;
+        yelpReview += `<p>Rating: ${self.rating}</p><br>`;
+        yelpReview += `<img src="${self.ratingImgUrl}"><br>`;
+        yelpReview += `<p>Reviews:${self.reviewCount} </p><br>`;
+        yelpReview += `<a href=\"" ${self.url} "\" target=\"_blank\">more information</a><br>`;
+        yelpReview += `</div>`;
+        return yelpReview;
+    };
+};
+
+ViewModel = {
+  //can later change hardcoded defaultMarkers to markers populated from an api call.
+    defaultMarkers: ko.observableArray(),
+    placeFilter: ko.observable([]),
+    yelpReviews: ko.observableArray([])
+}
+
+var getDataForMap = function () {
+  ViewModel.getYelpReviews();
+}
 
 ko.applyBindings(viewModel);
