@@ -1,6 +1,7 @@
 //Google map
 var map;
 var markers = [];
+var foursquareVenues = [];
 // Create placemarkers array to use in multiple functions to have control
 // over the number of places that show.
 var placeMarkers = [];
@@ -198,6 +199,8 @@ function initMap() {
     //Associate the styled map with the MapTypeId and set it to display.
     map.mapTypes.set('styled_map', styledMapType);
     map.setMapTypeId('styled_map');
+    //for now call it here, Knockout model not working yet
+    getFoursquarePlaces();
 
     var locations = [
       {title:'CodeCore', location: {lat: 49.281961 , lng: -123.10866}},
@@ -217,8 +220,11 @@ function initMap() {
     var highlightedIcon = makeMarkerIcon('24ffb0');
     //using the location array to create an array of markers
     for(var i = 0; i < locations.length; i++){
-        var position = locations[i].location;
-        var title = locations[i].title;
+        // var position = locations[i].location;
+        // var title = locations[i].title;
+        //try make markers using foursquareVenues:
+        var position = foursquareVenues[i].location;
+        var title = foursquareVenues[i].name;
         var lat = position.lat;
         var lng = position.lng;
         var coords = `&nbsp${lat} ,  ${lng}`;
@@ -310,6 +316,7 @@ function populateInfoWindow(marker, infowindow){
 }
 
 //Yelp API authentication
+//YELP IS STILL DOWN
 var yelpAuth = {
     //put keys here
     consumerKey: '',
@@ -323,7 +330,78 @@ var yelpAuth = {
     }
 };
 
+//Foursquare Implementation
+function getFoursquarePlaces() {
+// var foursquareVenues = [];
+
+//Foursquare AJAX request
+var baseUrl = 'https://api.foursquare.com/v2/venues/explore';
+var clientId = 'QWE1VBCMF05T3J1KBZLJQHAXLGZUWE2Y1N00YANFV0Y3FHD1';
+var clientSecret = 'U43ZC1UCLO50LSYW3OTOSKFSGWFEWJV1Y0VVE3K1ALXAQFXF';
+var defaultCity = 'Vancouver, BC';
+var userQuery = 'coffee';
+
+var foursquareUrl = `${baseUrl}?client_id=${clientId}&client_secret=${clientSecret}&v=20130815&near=${defaultCity}
+  &query=${userQuery}`;
+
+  $.ajax({
+        url: foursquareUrl,
+        dataType: "json",
+        success: function(data) {
+          var foursquarePlaces = data.response.groups[0].items;
+          for (var i = 0; i < foursquarePlaces.length; i++) {
+            console.log(foursquarePlaces[i]);
+            foursquareVenues.push(foursquarePlaces[i]);
+            //select lat/lng and title and push to foursquareVenues array, then make markers use that array rather than hardcoded locations array
+
+
+            //need title and lat/lng of foursquarePlaces, so need another AJAX
+            var baseVenueDetailsUrl = "https://api.foursquare.com/v2/venues/";
+            var foursquareVenueUrl = `${baseVenueDetailsUrl}${foursquarePlaces[i].venue.id}?client_id=${clientId}&client_secret=${clientSecret}&v=20130815`;
+
+            $.ajax({
+              url: foursquareVenueUrl,
+              dataType: "json",
+              success: function(data) {
+                var venue = data.response.venue;
+                // console.log(venue);
+
+                var self = this;
+                self.Venue = new Venue();
+                self.Venue.title = venue.name;
+                // self.Venue.url = venue.url;
+                self.Venue.lat = venue.location.lat;
+                self.Venue.lng = venue.location.lng;
+
+                ViewModel.foursquareVenues.push(self.Place);
+                // console.log(foursquareVenues);
+              },
+              error: function(response) {
+              console.log('errors ---', response);
+              }
+          // end inner ajax
+            });
+          //end of for loop
+          }
+          //end of success func
+        }
+  });
+
+  //end of getFoursquarePlaces()
+}
+
 //Knockout implementation
+
+//Model for Foursquare venues
+var Venue = function (){
+    var self = this;
+
+    self.title = '';
+    self.lat = '';
+    self.lng = '';
+    // self.url = '';
+
+};
 
 //Model for Yelp Reviews
 var YelpReview = function (){
@@ -353,12 +431,15 @@ var YelpReview = function (){
 ViewModel = {
   //can later change hardcoded defaultMarkers to markers populated from an api call.
     defaultMarkers: ko.observableArray(),
+    foursquareVenues: ko.observableArray(),
+    venuesFilter: ko.observableArray(),
     placeFilter: ko.observable([]),
     yelpReviews: ko.observableArray([])
-}
+};
 
 var getDataForMap = function () {
-  ViewModel.getYelpReviews();
+  // ViewModel.getYelpReviews();
+  ViewModel.getFoursquarePlaces();
 }
 
-ko.applyBindings(viewModel);
+ko.applyBindings(ViewModel);
