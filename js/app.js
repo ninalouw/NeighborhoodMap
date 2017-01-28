@@ -1,10 +1,9 @@
 //Google map
 var map;
-var markers = [];
 var foursquareVenues = [];
 // Create placemarkers array to use in multiple functions to have control
 // over the number of places that show.
-var placeMarkers = [];
+// var placeMarkers = [];
 
 function initMap() {
 //custom map style
@@ -199,67 +198,98 @@ function initMap() {
     //Associate the styled map with the MapTypeId and set it to display.
     map.mapTypes.set('styled_map', styledMapType);
     map.setMapTypeId('styled_map');
-    //for now call it here, Knockout model not working yet
-    getFoursquarePlaces();
 
-    var locations = [
+//these are hardcoded, will remove them later
+    var defaultLocations = [
       {title:'CodeCore', location: {lat: 49.281961 , lng: -123.10866}},
       {title:'Ask for Luigi', location: {lat: 49.284201 , lng: -123.097724}},
       {title:'Cafe Medina', location: {lat: 49.280515 , lng: -123.116851}},
       {title:'VanArts', location: {lat: 49.282698 , lng: -123.115358}},
       {title:'The Bar Method', location: {lat: 49.277303 , lng: -123.114827}},
-      {title:'K&J', location: {lat: 49.282897 , lng: -123.10708}},
+      {title:'Woodwards Building', location: {lat: 49.282897 , lng: -123.10708}},
       {title:'Revolver', location: {lat: 49.283191 , lng: -123.109452}}
     ];
 
     var largeInfoWindow = new google.maps.InfoWindow();
 
-    //styling the markers
-    var defaultIcon = makeMarkerIcon('00baff');
-    //highlighted marker color for when user hovers over markers
-    var highlightedIcon = makeMarkerIcon('24ffb0');
-    //using the location array to create an array of markers
-    for(var i = 0; i < locations.length; i++){
-        // var position = locations[i].location;
-        // var title = locations[i].title;
-        //try make markers using foursquareVenues:
-        var position = foursquareVenues[i].location;
-        var title = foursquareVenues[i].name;
-        var lat = position.lat;
-        var lng = position.lng;
-        var coords = `&nbsp${lat} ,  ${lng}`;
-        //create marker per location and put into markers array
-        var marker = new google.maps.Marker({
-            position: position,
-            title: title,
-            icon: defaultIcon,
-            coords: coords,
-            animation: google.maps.Animation.DROP,
-            id: i
-        });
-      //push the marker to our array of markers
-        markers.push(marker);
-        //extend boundaries of map
-        // bounds.extend(marker.position);
-        //create onclick event to open an InfoWindow at each marker
-        marker.addListener('click', function(){
-            populateInfoWindow(this, largeInfoWindow);
-        });
-        //two eventListeners, one for mouseover and one for mouseout,
-        //to change the colors back and forth
-        marker.addListener('mouseover', function(){
-            this.setIcon(highlightedIcon);
-        });
-        marker.addListener('mouseout', function(){
-            this.setIcon(defaultIcon);
-        });
-    }
+
+
     //
-    showListings();
+    // showListings();
 }
 
 //MAP FUNCTIONS
 
+// This function creates markers for each place found when the user does a 'explore venues on Foursquare' search. This search bar and necessary eventListeners will still be created.
+function createMarkersForPlaces(places) {
+  //styling the markers
+    var defaultIcon = makeMarkerIcon('00baff');
+  //highlighted marker color for when user hovers over markers
+    var highlightedIcon = makeMarkerIcon('24ffb0');
+    var bounds = new google.maps.LatLngBounds();
+    for (var i = 0; i < places.length; i++) {
+        var place = places[i];
+        var position = place.venue.location;
+        var title = place.name;
+        var lat = position.lat;
+        var lng = position.lng;
+        var coords = `&nbsp${lat} ,  ${lng}`;
+
+        var icon = {
+            url: place.icon,
+            size: new google.maps.Size(35, 35),
+            origin: new google.maps.Point(0, 0),
+            anchor: new google.maps.Point(15, 34),
+            scaledSize: new google.maps.Size(25, 25)
+        };
+
+           // Create a marker for each place.
+        var marker = new google.maps.Marker({
+            map: map,
+            icon: icon,
+            title: title,
+            position: position,
+            coords: coords,
+            id: place.place_id,
+            animation: google.maps.Animation.DROP
+        });
+           // Create a single infowindow to be used with the place details information
+           // so that only one is open at once.
+        var placeInfoWindow = new google.maps.InfoWindow();
+           // If a marker is clicked, do a place details search on it in the next function.
+        marker.addListener('click', function() {
+            if (placeInfoWindow.marker == this) {
+                console.log("This infowindow already is on this marker!");
+            } else {
+                getPlacesDetails(this, placeInfoWindow);
+            }
+        });
+        foursquareVenues.push(marker);
+        if (place.geometry.viewport) {
+     // Only geocodes have viewport.
+            bounds.union(place.geometry.viewport);
+        } else {
+            bounds.extend(place.geometry.location);
+        }
+    }
+    map.fitBounds(bounds);
+  //two eventListeners, one for mouseover and one for mouseout,
+  //to change the colors back and forth
+    marker.addListener('mouseover', function(){
+        this.setIcon(highlightedIcon);
+    });
+    marker.addListener('mouseout', function(){
+        this.setIcon(defaultIcon);
+    });
+}
+
+function getPlacesDetails () {
+
+}
+
+function openInfoWindow (){
+
+}
 //This func takes a color and creates anew marker icon of that color.
 //the icon will be 21px wide by 34 high, have an origin of 0, 0
 //and be anchored at 10,34.
@@ -332,7 +362,6 @@ var yelpAuth = {
 
 //Foursquare Implementation
 function getFoursquarePlaces() {
-// var foursquareVenues = [];
 
 //Foursquare AJAX request
 var baseUrl = 'https://api.foursquare.com/v2/venues/explore';
