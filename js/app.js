@@ -212,76 +212,116 @@ function initMap() {
 
     var largeInfoWindow = new google.maps.InfoWindow();
 
-
-
-    //
+    //here I removed code that added hardcoded defaultLocations to page
     // showListings();
 }
 
 //MAP FUNCTIONS
+//search functions for foursquareVenues, when user presses enter on foursquare searchbox
+function searchFoursquare (data, event) {
+  var keyCode = (event.which ? event.which : event.keyCode);
+  if (keyCode === 13) {
+    // hideMarkers(placeMarkers);
+    getDataForMap();
+    return false;
+  }
+  return true;
+};
+
+
+function getDataForMap () {
+  // ViewModel.getYelpReviews();
+    getFoursquarePlaces();
+}
+
+function getFoursquarePlaces () {
+//remove other possible markers here
+
+//Foursquare AJAX request
+var baseUrl = 'https://api.foursquare.com/v2/venues/explore';
+var clientId = 'QWE1VBCMF05T3J1KBZLJQHAXLGZUWE2Y1N00YANFV0Y3FHD1';
+var clientSecret = 'U43ZC1UCLO50LSYW3OTOSKFSGWFEWJV1Y0VVE3K1ALXAQFXF';
+var defaultCity = 'Vancouver, BC';
+// var userQuery = document.getElementById('#search-bar').value;
+var userQuery = 'coffee';
+
+var foursquareUrl = `${baseUrl}?client_id=${clientId}&client_secret=${clientSecret}&v=20130815&near=${defaultCity}
+  &query=${userQuery}`;
+
+  $.ajax({
+        url: foursquareUrl,
+        dataType: "json",
+        success: function(data) {
+          var foursquarePlaces = data.response.groups[0].items;
+          for (var i = 0; i < foursquarePlaces.length; i++) {
+            console.log(foursquarePlaces[i]);
+            var place = foursquarePlaces[i];
+            var position = place.venue.location;
+            var name = place.venue.name;
+            var lat = position.lat;
+            var lng = position.lng;
+            var url = place.venue.url;
+            var coords = `&nbsp${lat} ,  ${lng}`;
+
+            createMarkersForPlaces(lat, lng, name, url);
+            // foursquareVenues.push(foursquarePlaces[i]);
+            //select lat/lng and title and push to foursquareVenues array, then make markers use that array rather than hardcoded locations array
+
+          //end of for loop
+          }
+        //end of success func
+        },
+    		error: function(xhr, status, err){
+    				console.log(err);
+          }
+  });
+
+  //end of getFoursquarePlaces()
+};
 
 // This function creates markers for each place found when the user does a 'explore venues on Foursquare' search. This search bar and necessary eventListeners will still be created.
-function createMarkersForPlaces(places) {
+function createMarkersForPlaces(lat, lng, name, url) {
   //styling the markers
     var defaultIcon = makeMarkerIcon('00baff');
   //highlighted marker color for when user hovers over markers
     var highlightedIcon = makeMarkerIcon('24ffb0');
-    var bounds = new google.maps.LatLngBounds();
-    for (var i = 0; i < places.length; i++) {
-        var place = places[i];
-        var position = place.venue.location;
-        var title = place.name;
-        var lat = position.lat;
-        var lng = position.lng;
-        var coords = `&nbsp${lat} ,  ${lng}`;
 
-        var icon = {
-            url: place.icon,
-            size: new google.maps.Size(35, 35),
-            origin: new google.maps.Point(0, 0),
-            anchor: new google.maps.Point(15, 34),
-            scaledSize: new google.maps.Size(25, 25)
-        };
+    var latlng = new google.maps.LatLng(lat, lng);
 
-           // Create a marker for each place.
+      // Create a marker for each place.
         var marker = new google.maps.Marker({
             map: map,
-            icon: icon,
-            title: title,
-            position: position,
-            coords: coords,
-            id: place.place_id,
+            name: name,
+            url: url,
+            position: latlng,
             animation: google.maps.Animation.DROP
         });
+
+        //two eventListeners, one for mouseover and one for mouseout,
+        //to change the colors back and forth
+          marker.addListener('mouseover', function(){
+              this.setIcon(highlightedIcon);
+          });
+          marker.addListener('mouseout', function(){
+              this.setIcon(defaultIcon);
+          });
            // Create a single infowindow to be used with the place details information
            // so that only one is open at once.
-        var placeInfoWindow = new google.maps.InfoWindow();
-           // If a marker is clicked, do a place details search on it in the next function.
-        marker.addListener('click', function() {
-            if (placeInfoWindow.marker == this) {
-                console.log("This infowindow already is on this marker!");
-            } else {
-                getPlacesDetails(this, placeInfoWindow);
-            }
-        });
-        foursquareVenues.push(marker);
-        if (place.geometry.viewport) {
-     // Only geocodes have viewport.
-            bounds.union(place.geometry.viewport);
-        } else {
-            bounds.extend(place.geometry.location);
-        }
-    }
-    map.fitBounds(bounds);
-  //two eventListeners, one for mouseover and one for mouseout,
-  //to change the colors back and forth
-    marker.addListener('mouseover', function(){
-        this.setIcon(highlightedIcon);
-    });
-    marker.addListener('mouseout', function(){
-        this.setIcon(defaultIcon);
-    });
+        // var placeInfoWindow = new google.maps.InfoWindow();
+        //    // If a marker is clicked, do a place details search on it in the next function.
+        // google.maps.event.addListener(marker, 'click', function() {
+        //     if (placeInfoWindow.marker == this) {
+        //         console.log("This infowindow already is on this marker!");
+        //     } else {
+        //         // getPlacesDetails(this, placeInfoWindow);
+        //         openInfoWindow(place, marker);
+        //     }
+        // });
+        foursquareVenues[name] = marker;
+        console.log(marker);
+         return marker;
 }
+document.getElementById('show-foursquare').addEventListener('click', showFoursquareVenues);
 
 function getPlacesDetails () {
 
@@ -303,8 +343,10 @@ function makeMarkerIcon(markerColor){
 }
 
 //this func will loop through the markers array and display them all
-function showListings(){
+function showFoursquareVenues(){
     var bounds = new google.maps.LatLngBounds();
+    // var marker = foursquareLocations[name];
+    var markers = foursquareVenues;
   //extend boundaries of the map for each marker and display the marker
     for(var i = 0; i < markers.length; i++){
         markers[i].setMap(map);
@@ -313,162 +355,35 @@ function showListings(){
     map.fitBounds(bounds);
 }
 
-//YELP API
-
-//populate info window when marker is clicked
-function populateInfoWindow(marker, infowindow){
-  if (infowindow.marker != marker) {
-    infowindow.setContent('');
-    infowindow.marker = marker;
-    //make sure marker property is cleared if infowindow closed
-    infowindow.addListener('closeclick', function(){
-      infowindow.marker = null;
-    });
-    //define Yelp review here/call it
-
-
-
-    function getYelpReviews () {
-      var yelpReviewsArray = ViewModel.yelpReviews();
-      if (yelpReviewsArray.length > 0) {
-
-          infowindow.setContent(`<div>&nbsp${marker.title}</div><br><div id='yelp-review' ><h1>Yelp Review</h1> </div>`);
-
-          // var review = new Yelp(document.getElementById('yelp-review'));
-
-        } else {
-        infowindow.setContent(`<div>&nbsp${marker.title}</div><div>No Yelp review found</div>`);
-      }
-    }
-    //open infowindow on correct marker
-    infowindow.open(map, marker);
-  }
-}
-
-//Yelp API authentication
-//YELP IS STILL DOWN
-var yelpAuth = {
-    //put keys here
-    consumerKey: '',
-    consumerSecret: '',
-    accessToken: '',
-    //Udacity specified that we should put our keys in our app, although in
-    //reality this would not be done
-    accessTokenSecret: '',
-    serviceProvider: {
-        signatureMethod: 'HMAC-SHA1'
-    }
-};
-
 //Foursquare Implementation
-function getFoursquarePlaces() {
 
-//Foursquare AJAX request
-var baseUrl = 'https://api.foursquare.com/v2/venues/explore';
-var clientId = 'QWE1VBCMF05T3J1KBZLJQHAXLGZUWE2Y1N00YANFV0Y3FHD1';
-var clientSecret = 'U43ZC1UCLO50LSYW3OTOSKFSGWFEWJV1Y0VVE3K1ALXAQFXF';
-var defaultCity = 'Vancouver, BC';
-var userQuery = 'coffee';
-
-var foursquareUrl = `${baseUrl}?client_id=${clientId}&client_secret=${clientSecret}&v=20130815&near=${defaultCity}
-  &query=${userQuery}`;
-
-  $.ajax({
-        url: foursquareUrl,
-        dataType: "json",
-        success: function(data) {
-          var foursquarePlaces = data.response.groups[0].items;
-          for (var i = 0; i < foursquarePlaces.length; i++) {
-            console.log(foursquarePlaces[i]);
-            foursquareVenues.push(foursquarePlaces[i]);
-            //select lat/lng and title and push to foursquareVenues array, then make markers use that array rather than hardcoded locations array
-
-
-            //need title and lat/lng of foursquarePlaces, so need another AJAX
-            var baseVenueDetailsUrl = "https://api.foursquare.com/v2/venues/";
-            var foursquareVenueUrl = `${baseVenueDetailsUrl}${foursquarePlaces[i].venue.id}?client_id=${clientId}&client_secret=${clientSecret}&v=20130815`;
-
-            $.ajax({
-              url: foursquareVenueUrl,
-              dataType: "json",
-              success: function(data) {
-                var venue = data.response.venue;
-                // console.log(venue);
-
-                var self = this;
-                self.Venue = new Venue();
-                self.Venue.title = venue.name;
-                // self.Venue.url = venue.url;
-                self.Venue.lat = venue.location.lat;
-                self.Venue.lng = venue.location.lng;
-
-                ViewModel.foursquareVenues.push(self.Place);
-                // console.log(foursquareVenues);
-              },
-              error: function(response) {
-              console.log('errors ---', response);
-              }
-          // end inner ajax
-            });
-          //end of for loop
-          }
-          //end of success func
-        }
-  });
-
-  //end of getFoursquarePlaces()
-}
 
 //Knockout implementation
 
 //Model for Foursquare venues
-var Venue = function (){
+// var Venue = function (){
+//     var self = this;
+//
+//     self.title = '';
+//     self.lat = '';
+//     self.lng = '';
+//     self.url = '';
+//
+// };
+
+
+function ViewModel (){
     var self = this;
-
-    self.title = '';
-    self.lat = '';
-    self.lng = '';
-    // self.url = '';
-
-};
-
-//Model for Yelp Reviews
-var YelpReview = function (){
-    var self = this;
-
-    self.imageUrl = '';
-    self.name = '';
-    self.rating = '';
-    self.ratingImgUrl = '';
-    self.reviewCount = '';
-    self.url = '';
-
-    self.buildReview = function() {
-        var yelpReview = '';
-        yelpReview += `<div class="yelp-review">`;
-        yelpReview += `<img src="${self.imageUrl}"><br>`
-        yelpReview += `<p>${self.name}</p>`;
-        yelpReview += `<p>Rating: ${self.rating}</p><br>`;
-        yelpReview += `<img src="${self.ratingImgUrl}"><br>`;
-        yelpReview += `<p>Reviews:${self.reviewCount} </p><br>`;
-        yelpReview += `<a href=\"" ${self.url} "\" target=\"_blank\">more information</a><br>`;
-        yelpReview += `</div>`;
-        return yelpReview;
-    };
-};
-
-ViewModel = {
   //can later change hardcoded defaultMarkers to markers populated from an api call.
-    defaultMarkers: ko.observableArray(),
-    foursquareVenues: ko.observableArray(),
-    venuesFilter: ko.observableArray(),
-    placeFilter: ko.observable([]),
-    yelpReviews: ko.observableArray([])
-};
+    self.defaultMarkers = ko.observableArray();
+    self.foursquareVenues = ko.observableArray();
+    self.venuesFilter = ko.observableArray();
+    self.placeFilter = ko.observable([]);
+    self.yelpReviews = ko.observableArray([]);
 
-var getDataForMap = function () {
-  // ViewModel.getYelpReviews();
-  ViewModel.getFoursquarePlaces();
+//end of ViewModel
 }
 
-ko.applyBindings(ViewModel);
+var viewModel = new ViewModel();
+
+ko.applyBindings(viewModel);
