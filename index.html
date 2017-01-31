@@ -34,8 +34,9 @@
           <div class="col m3">
           <div class="options-box">
             <div>
-              <input id="search-bar" type="text" placeholder="Search Foursquare, ex: 'coffee'">
-              <input id="show-foursquare" class="btn btn-primary" type="button" value="Search">
+              <!-- add Knockout bindings -->
+              <input id="search-bar" data-bind="value: userQuery, valueUpdate:'keypress'" type="text" placeholder="Search Foursquare, ex: 'coffee'">
+              <input id="show-foursquare" data-bind="click:userSearch,enable:userQuery" class="btn btn-primary" type="button" value="Search">
             </div>
             <div>
               <input id="filter-bar" type="text" placeholder="Filter the listings">

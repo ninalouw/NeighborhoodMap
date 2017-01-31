@@ -205,65 +205,7 @@ function initMap() {
 
 //MAP FUNCTIONS
 
-//search functions for foursquareVenues, when user presses enter on foursquare searchbox
-// function searchFoursquare (data, event) {
-//   var keyCode = (event.which ? event.which : event.keyCode);
-//   if (keyCode === 13) {
-//     // hideMarkers(placeMarkers);
-//     getDataForMap();
-//     return false;
-//   }
-//   return true;
-// };
-
-document.getElementById('show-foursquare').addEventListener('click', function (){
-    getFoursquarePlaces();
-});
-
-function getFoursquarePlaces () {
-//remove other possible markers here(hardcoded initial markers)
-
-//get user seach term from search bar
-var userQuery = document.getElementById('search-bar').value;
-//Foursquare AJAX request
-var baseUrl = 'https://api.foursquare.com/v2/venues/explore';
-var clientId = 'QWE1VBCMF05T3J1KBZLJQHAXLGZUWE2Y1N00YANFV0Y3FHD1';
-var clientSecret = 'U43ZC1UCLO50LSYW3OTOSKFSGWFEWJV1Y0VVE3K1ALXAQFXF';
-var defaultCity = 'Vancouver, BC';
-// var userQuery = 'food';
-
-var foursquareUrl = `${baseUrl}?client_id=${clientId}&client_secret=${clientSecret}&v=20130815&near=${defaultCity}
-  &query=${userQuery}`;
-
-  $.ajax({
-        url: foursquareUrl,
-        dataType: "json",
-        success: function(data) {
-          var foursquarePlaces = data.response.groups[0].items;
-          for (var i = 0; i < foursquarePlaces.length; i++) {
-            console.log(foursquarePlaces[i]);
-            var place = foursquarePlaces[i];
-            var position = place.venue.location;
-            var name = place.venue.name;
-            var lat = position.lat;
-            var lng = position.lng;
-            var url = place.venue.url;
-            var rating = place.venue.rating;
-            var address = position.address;
-            var coords = `&nbsp${lat} ,  ${lng}`;
-
-            createMarkersForPlaces(lat, lng, name, url, rating, address);
-            // foursquareVenues.push(foursquarePlaces[i]);
-          }
-        },
-    		error: function(xhr, status, err){
-    				console.log(err);
-          }
-  });
-
-};
-
-// This function creates markers for each place found when getFoursquarePlaces() is successful.
+// This function creates markers for each place found when getFoursquareVenues() is successful.
 function createMarkersForPlaces(lat, lng, name, url, rating, address) {
   //styling the markers
     var defaultIcon = makeMarkerIcon('00baff');
@@ -310,33 +252,26 @@ function createMarkersForPlaces(lat, lng, name, url, rating, address) {
 }
 
 
-function createInfoWindowContent (marker, infowindow) {
-  //build html that will show up in infowindow onclick of marker
-      // Set the marker property on this infowindow so it isn't created again.
-      infowindow.marker = marker;
-      var innerHTML = '<div>';
-      if (marker.name) {
-        innerHTML += `<strong>${marker.name}</strong><hr>`;
-      }
-      if(marker.rating){
-        innerHTML += `<p>Rating:&nbsp${marker.rating}</p>`;
-      }
-      if(marker.address){
-        innerHTML += `<p>Address:&nbsp${marker.address}</p>`;
-      }
-      if(marker.url){
-        innerHTML += `<a href=\"${marker.url}\" target=\"_blank\">Website</a>`;
-      }
-      innerHTML += '</div>';
-      infowindow.setContent(innerHTML);
-      infowindow.open(map, marker);
-      // Make sure the marker property is cleared if the infowindow is closed.
-      infowindow.addListener('closeclick', function() {
-        infowindow.marker = null;
-      });
-}
+
 
 function openInfoWindow (){
+
+}
+
+//this func will loop through the markers array and display them all
+function showMarkers(){
+    var bounds = new google.maps.LatLngBounds();
+    // var marker = foursquareLocations[name];
+    var markers = foursquareVenues;
+  //extend boundaries of the map for each marker and display the marker
+    for(var i = 0; i < markers.length; i++){
+        markers[i].setMap(map);
+        bounds.extend(markers[i].position);
+    }
+    map.fitBounds(bounds);
+}
+
+function hideMarkers (){
 
 }
 //This func takes a color and creates anew marker icon of that color.
@@ -351,48 +286,153 @@ function makeMarkerIcon(markerColor){
     return markerImage;
 }
 
-//this func will loop through the markers array and display them all
-function showFoursquareVenues(){
-    var bounds = new google.maps.LatLngBounds();
-    // var marker = foursquareLocations[name];
-    var markers = foursquareVenues;
-  //extend boundaries of the map for each marker and display the marker
-    for(var i = 0; i < markers.length; i++){
-        markers[i].setMap(map);
-        bounds.extend(markers[i].position);
-    }
-    map.fitBounds(bounds);
-}
-
-//Foursquare Implementation
-
 
 //Knockout implementation
 
 //Model for Foursquare venues
-// var Venue = function (){
-//     var self = this;
-//
-//     self.title = '';
-//     self.lat = '';
-//     self.lng = '';
-//     self.url = '';
-//
-// };
-
-
-function ViewModel (){
+var Venue = function (){
     var self = this;
+
+    self.name = '';
+    self.lat = '';
+    self.lng = '';
+    self.url = '';
+    self.rating = '';
+    // self.ratingColor = '';
+    self.price = '';
+    self.description = '';
+    self.address = '';
+    self.photo = '';
+    self.contact = '';
+    self.checkinsCount = '';
+    self.isOpen = '';
+
+    self.selectedVenue = ko.observable(false);
+    self.showPlace = ko.observable(true);
+
+    //func to create content to populate infowindow
+    self.createInfoWindowContent = function () {
+      //build html that will show up in infowindow onclick of marker
+          // Set the marker property on this infowindow so it isn't created again.
+          // infowindow.marker = marker;
+          var innerHTML = '<div>';
+          if (marker.name) {
+            innerHTML += `<strong>${marker.name}</strong><hr>`;
+          }
+          if(marker.rating){
+            innerHTML += `<p>Rating:&nbsp${marker.rating}</p>`;
+          }
+          if(marker.address){
+            innerHTML += `<p>Address:&nbsp${marker.address}</p>`;
+          }
+          if(marker.url){
+            innerHTML += `<a href=\"${marker.url}\" target=\"_blank\">Website</a>`;
+          }
+          innerHTML += '</div>';
+          infowindow.setContent(innerHTML);
+          // infowindow.open(map, marker);
+          // Make sure the marker property is cleared if the infowindow is closed.
+          // infowindow.addListener('closeclick', function() {
+          //   infowindow.marker = null;
+          // });
+    };
+};
+
+
+ViewModel = {
   //can later change hardcoded defaultMarkers to markers populated from an api call.
-    self.defaultMarkers = ko.observableArray();
-    self.foursquareVenues = ko.observableArray();
-    self.venuesFilter = ko.observableArray();
-    self.placeFilter = ko.observable([]);
-    self.yelpReviews = ko.observableArray([]);
+    defaultMarkers: ko.observableArray([]),
+    places: ko.observableArray([]),
+    userQuery: ko.observable(),
+    placeFilter: ko.observable([]),
+    showFilterList: ko.observable(true),
+    showFilterErrorList: ko.observable(false),
+
+    //implement Knockout place filter here
+
+    //user search function - user input of term into search bar
+    userSearch: function(){
+	    var query = $('#search-bar').val();
+      this.getDataForMap();
+    },
+    // document.getElementById('show-foursquare').addEventListener('click', function (){
+    //     getFoursquareVenues();
+    // });
+
+getDataForMap: function (){
+  ViewModel.getFoursquareVenues();
+},
+
+getFoursquareVenues: function (){
+
+//remove other possible markers here(e.g.hardcoded initial markers)
+ViewModel.places().forEach(function(place){
+  removeMarker(place.name);
+});
+ViewModel.places.removeAll();
+
+//get user seach term from search bar
+// var userQuery = document.getElementById('search-bar').value;
+var userQuery = $('#search-bar').val();
+//Foursquare AJAX request
+var baseUrl = 'https://api.foursquare.com/v2/venues/explore';
+var clientId = 'QWE1VBCMF05T3J1KBZLJQHAXLGZUWE2Y1N00YANFV0Y3FHD1';
+var clientSecret = 'U43ZC1UCLO50LSYW3OTOSKFSGWFEWJV1Y0VVE3K1ALXAQFXF';
+//later let user set city
+var defaultCity = 'Vancouver, BC';
+// var userQuery = 'food';
+
+var foursquareUrl = `${baseUrl}?client_id=${clientId}&client_secret=${clientSecret}&v=20130815&near=${defaultCity}
+  &query=${userQuery}`;
+
+  $.ajax({
+        url: foursquareUrl,
+        dataType: "json",
+        success: function(data) {
+          var foursquarePlaces = data.response.groups[0].items;
+          for (var i = 0; i < foursquarePlaces.length; i++) {
+            console.log(foursquarePlaces[i]);
+            var place = foursquarePlaces[i];
+            var venue = place.venue;
+
+            var self = this;
+            self.Venue = new Venue();
+
+            self.Venue.position = venue.location;
+            self.Venue.name = venue.name;
+            self.Venue.lat = venue.location.lat;
+            self.Venue.lng = venue.location.lng;
+            self.Venue.url = venue.url;
+            self.Venue.rating = venue.rating;
+            self.Venue.price = venue.price.message;
+            self.Venue.description = venue.description;
+            self.Venue.address = venue.location.address;
+            self.Venue.photos = venue.photos;
+            self.Venue.contact = venue.contact.formattedPhone;
+            self.Venue.checkinsCount = venue.stats.checkinsCount;
+            self.Venue.isOpen = venue.hours.isOpen;
+
+            // var position = place.venue.location;
+            // var name = place.venue.name;
+            // var lat = position.lat;
+            // var lng = position.lng;
+            // var url = place.venue.url;
+            // var rating = place.venue.rating;
+            // var address = position.address;
+            // var coords = `&nbsp${lat} ,  ${lng}`;
+
+            createMarkersForPlaces(self.Venue.lat, self.Venue.lng, self.Venue.name, self.Venue.url, self.Venue.rating, self.Venue.address);
+            ViewModel.places.push(self.Venue);
+          }
+        },
+    		error: function(xhr, status, err){
+    				console.log(err);
+          }
+  });
+
+}
 
 //end of ViewModel
 }
 
-var viewModel = new ViewModel();
-
-ko.applyBindings(viewModel);
+ko.applyBindings(ViewModel);
