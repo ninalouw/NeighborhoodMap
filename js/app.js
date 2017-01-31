@@ -204,6 +204,7 @@ function initMap() {
 }
 
 //MAP FUNCTIONS
+
 //search functions for foursquareVenues, when user presses enter on foursquare searchbox
 // function searchFoursquare (data, event) {
 //   var keyCode = (event.which ? event.which : event.keyCode);
@@ -247,9 +248,11 @@ var foursquareUrl = `${baseUrl}?client_id=${clientId}&client_secret=${clientSecr
             var lat = position.lat;
             var lng = position.lng;
             var url = place.venue.url;
+            var rating = place.venue.rating;
+            var address = position.address;
             var coords = `&nbsp${lat} ,  ${lng}`;
 
-            createMarkersForPlaces(lat, lng, name, url);
+            createMarkersForPlaces(lat, lng, name, url, rating, address);
             // foursquareVenues.push(foursquarePlaces[i]);
           }
         },
@@ -261,7 +264,7 @@ var foursquareUrl = `${baseUrl}?client_id=${clientId}&client_secret=${clientSecr
 };
 
 // This function creates markers for each place found when getFoursquarePlaces() is successful.
-function createMarkersForPlaces(lat, lng, name, url) {
+function createMarkersForPlaces(lat, lng, name, url, rating, address) {
   //styling the markers
     var defaultIcon = makeMarkerIcon('00baff');
   //highlighted marker color for when user hovers over markers
@@ -274,6 +277,8 @@ function createMarkersForPlaces(lat, lng, name, url) {
             map: map,
             name: name,
             url: url,
+            rating: rating,
+            address: address,
             position: latlng,
             icon: defaultIcon,
             animation: google.maps.Animation.DROP
@@ -289,24 +294,46 @@ function createMarkersForPlaces(lat, lng, name, url) {
           });
            // Create a single infowindow to be used with the place details information
            // so that only one is open at once.
-        // var placeInfoWindow = new google.maps.InfoWindow();
-        //    // If a marker is clicked, do a place details search on it in the next function.
-        // google.maps.event.addListener(marker, 'click', function() {
-        //     if (placeInfoWindow.marker == this) {
-        //         console.log("This infowindow already is on this marker!");
-        //     } else {
-        //         // getPlacesDetails(this, placeInfoWindow);
-        //         openInfoWindow(place, marker);
-        //     }
-        // });
+        var placeInfoWindow = new google.maps.InfoWindow();
+           // If a marker is clicked, do a place details search on it in the next function.
+        google.maps.event.addListener(marker, 'click', function() {
+            if (placeInfoWindow.marker == this) {
+                console.log("This infowindow already is on this marker!");
+            } else {
+                createInfoWindowContent(this, placeInfoWindow);
+                openInfoWindow(place, marker);
+            }
+        });
         foursquareVenues[name] = marker;
         console.log(marker);
          return marker;
 }
 
 
-function getPlacesDetails () {
-
+function createInfoWindowContent (marker, infowindow) {
+  //build html that will show up in infowindow onclick of marker
+      // Set the marker property on this infowindow so it isn't created again.
+      infowindow.marker = marker;
+      var innerHTML = '<div>';
+      if (marker.name) {
+        innerHTML += `<strong>${marker.name}</strong><hr>`;
+      }
+      if(marker.rating){
+        innerHTML += `<p>Rating:&nbsp${marker.rating}</p>`;
+      }
+      if(marker.address){
+        innerHTML += `<p>Address:&nbsp${marker.address}</p>`;
+      }
+      if(marker.url){
+        innerHTML += `<a href=\"${marker.url}\" target=\"_blank\">Website</a>`;
+      }
+      innerHTML += '</div>';
+      infowindow.setContent(innerHTML);
+      infowindow.open(map, marker);
+      // Make sure the marker property is cleared if the infowindow is closed.
+      infowindow.addListener('closeclick', function() {
+        infowindow.marker = null;
+      });
 }
 
 function openInfoWindow (){
