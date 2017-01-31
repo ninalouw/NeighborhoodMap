@@ -199,51 +199,37 @@ function initMap() {
     map.mapTypes.set('styled_map', styledMapType);
     map.setMapTypeId('styled_map');
 
-//these are hardcoded, will remove them later
-    var defaultLocations = [
-      {title:'CodeCore', location: {lat: 49.281961 , lng: -123.10866}},
-      {title:'Ask for Luigi', location: {lat: 49.284201 , lng: -123.097724}},
-      {title:'Cafe Medina', location: {lat: 49.280515 , lng: -123.116851}},
-      {title:'VanArts', location: {lat: 49.282698 , lng: -123.115358}},
-      {title:'The Bar Method', location: {lat: 49.277303 , lng: -123.114827}},
-      {title:'Woodwards Building', location: {lat: 49.282897 , lng: -123.10708}},
-      {title:'Revolver', location: {lat: 49.283191 , lng: -123.109452}}
-    ];
-
     var largeInfoWindow = new google.maps.InfoWindow();
 
-    //here I removed code that added hardcoded defaultLocations to page
-    // showListings();
 }
 
 //MAP FUNCTIONS
 //search functions for foursquareVenues, when user presses enter on foursquare searchbox
-function searchFoursquare (data, event) {
-  var keyCode = (event.which ? event.which : event.keyCode);
-  if (keyCode === 13) {
-    // hideMarkers(placeMarkers);
-    getDataForMap();
-    return false;
-  }
-  return true;
-};
+// function searchFoursquare (data, event) {
+//   var keyCode = (event.which ? event.which : event.keyCode);
+//   if (keyCode === 13) {
+//     // hideMarkers(placeMarkers);
+//     getDataForMap();
+//     return false;
+//   }
+//   return true;
+// };
 
-
-function getDataForMap () {
-  // ViewModel.getYelpReviews();
+document.getElementById('show-foursquare').addEventListener('click', function (){
     getFoursquarePlaces();
-}
+});
 
 function getFoursquarePlaces () {
-//remove other possible markers here
+//remove other possible markers here(hardcoded initial markers)
 
+//get user seach term from search bar
+var userQuery = document.getElementById('search-bar').value;
 //Foursquare AJAX request
 var baseUrl = 'https://api.foursquare.com/v2/venues/explore';
 var clientId = 'QWE1VBCMF05T3J1KBZLJQHAXLGZUWE2Y1N00YANFV0Y3FHD1';
 var clientSecret = 'U43ZC1UCLO50LSYW3OTOSKFSGWFEWJV1Y0VVE3K1ALXAQFXF';
 var defaultCity = 'Vancouver, BC';
-// var userQuery = document.getElementById('#search-bar').value;
-var userQuery = 'coffee';
+// var userQuery = 'food';
 
 var foursquareUrl = `${baseUrl}?client_id=${clientId}&client_secret=${clientSecret}&v=20130815&near=${defaultCity}
   &query=${userQuery}`;
@@ -265,21 +251,16 @@ var foursquareUrl = `${baseUrl}?client_id=${clientId}&client_secret=${clientSecr
 
             createMarkersForPlaces(lat, lng, name, url);
             // foursquareVenues.push(foursquarePlaces[i]);
-            //select lat/lng and title and push to foursquareVenues array, then make markers use that array rather than hardcoded locations array
-
-          //end of for loop
           }
-        //end of success func
         },
     		error: function(xhr, status, err){
     				console.log(err);
           }
   });
 
-  //end of getFoursquarePlaces()
 };
 
-// This function creates markers for each place found when the user does a 'explore venues on Foursquare' search. This search bar and necessary eventListeners will still be created.
+// This function creates markers for each place found when getFoursquarePlaces() is successful.
 function createMarkersForPlaces(lat, lng, name, url) {
   //styling the markers
     var defaultIcon = makeMarkerIcon('00baff');
@@ -294,6 +275,7 @@ function createMarkersForPlaces(lat, lng, name, url) {
             name: name,
             url: url,
             position: latlng,
+            icon: defaultIcon,
             animation: google.maps.Animation.DROP
         });
 
@@ -321,7 +303,7 @@ function createMarkersForPlaces(lat, lng, name, url) {
         console.log(marker);
          return marker;
 }
-document.getElementById('show-foursquare').addEventListener('click', showFoursquareVenues);
+
 
 function getPlacesDetails () {
 
