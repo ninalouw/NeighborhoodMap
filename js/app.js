@@ -204,9 +204,8 @@ function initMap() {
 }
 
 //MAP FUNCTIONS
-
 // This function creates markers for each place found when getFoursquareVenues() is successful.
-function createMarkersForPlaces(lat, lng, name, url, rating, address) {
+function createMarkersForPlaces(lat, lng, name, url) {
   //styling the markers
     var defaultIcon = makeMarkerIcon('00baff');
   //highlighted marker color for when user hovers over markers
@@ -219,8 +218,6 @@ function createMarkersForPlaces(lat, lng, name, url, rating, address) {
             map: map,
             name: name,
             url: url,
-            rating: rating,
-            address: address,
             position: latlng,
             icon: defaultIcon,
             animation: google.maps.Animation.DROP
@@ -234,28 +231,31 @@ function createMarkersForPlaces(lat, lng, name, url, rating, address) {
           marker.addListener('mouseout', function(){
               this.setIcon(defaultIcon);
           });
-           // Create a single infowindow to be used with the place details information
-           // so that only one is open at once.
-        var placeInfoWindow = new google.maps.InfoWindow();
            // If a marker is clicked, do a place details search on it in the next function.
         google.maps.event.addListener(marker, 'click', function() {
-            if (placeInfoWindow.marker == this) {
-                console.log("This infowindow already is on this marker!");
-            } else {
-                createInfoWindowContent(this, placeInfoWindow);
-                openInfoWindow(place, marker);
-            }
+                ViewModel.places().forEach(function(place) {
+                    if (place.name.toLowerCase() == marker.name.toLowerCase()) {
+                        openInfoWindow(place, marker);
+                    }
+                });
         });
-        foursquareVenues[name] = marker;
-        console.log(marker);
-         return marker;
+    foursquareVenues[name] = marker;
+    console.log(marker);
+    return marker;
 }
 
 
-
-
-function openInfoWindow (){
-
+function openInfoWindow (place, marker){
+  // Create a single infowindow to be used with the place details information
+  // so that only one is open at once.
+    var infoWindow = new google.maps.InfoWindow();
+    var html = place.createInfoWindowContent();
+    infoWindow.setContent(html);
+    infoWindow.open(map, marker);
+    // Make sure the marker property is cleared if the infowindow is closed.
+    infoWindow.addListener('closeclick', function() {
+        infoWindow.marker = null;
+    });
 }
 
 //this func will loop through the markers array and display them all
@@ -313,28 +313,40 @@ var Venue = function (){
     //func to create content to populate infowindow
     self.createInfoWindowContent = function () {
       //build html that will show up in infowindow onclick of marker
-          // Set the marker property on this infowindow so it isn't created again.
-          // infowindow.marker = marker;
-          var innerHTML = '<div>';
-          if (marker.name) {
-            innerHTML += `<strong>${marker.name}</strong><hr>`;
+          var innerHTML = '';
+          innerHTML += '<div>'
+          if (self.name) {
+            innerHTML += `<strong><h6>${self.name}</h6></strong> <hr>`;
           }
-          if(marker.rating){
-            innerHTML += `<p>Rating:&nbsp${marker.rating}</p>`;
+          if(self.photo){
+            innerHTML += `<a href=\"${self.photo}\" target=\"_blank\"><img src=\"${self.photo}\" /></a><br>`;
           }
-          if(marker.address){
-            innerHTML += `<p>Address:&nbsp${marker.address}</p>`;
+          if(self.rating){
+            innerHTML += `<p>Rating:&nbsp${self.rating}</p>`;
           }
-          if(marker.url){
-            innerHTML += `<a href=\"${marker.url}\" target=\"_blank\">Website</a>`;
+          if(self.checkinsCount){
+            innerHTML += `<p>Total Check-ins:&nbsp${self.checkinsCount}</p>`;
+          }
+          if(self.price){
+            innerHTML += `<p>Price-range:&nbsp${self.price}</p>`;
+          }
+          if(self.isOpen){
+            innerHTML += `<p>Open now:&nbsp${self.isOpen}</p>`;
+          }
+          if(self.address){
+            innerHTML += `<p>Address:&nbsp${self.address}</p>`;
+          }
+          if(self.contact){
+            innerHTML += `<p>Phone number:&nbsp${self.contact}</p>`;
+          }
+          if(self.description){
+            innerHTML += `<p>"&nbsp${self.description}"</p>`;
+          }
+          if(self.url){
+            innerHTML += `<a href=\"${self.url}\" target=\"_blank\">Website</a>`;
           }
           innerHTML += '</div>';
-          infowindow.setContent(innerHTML);
-          // infowindow.open(map, marker);
-          // Make sure the marker property is cleared if the infowindow is closed.
-          // infowindow.addListener('closeclick', function() {
-          //   infowindow.marker = null;
-          // });
+          return innerHTML;
     };
 };
 
@@ -412,16 +424,7 @@ var foursquareUrl = `${baseUrl}?client_id=${clientId}&client_secret=${clientSecr
             self.Venue.checkinsCount = venue.stats.checkinsCount;
             self.Venue.isOpen = venue.hours.isOpen;
 
-            // var position = place.venue.location;
-            // var name = place.venue.name;
-            // var lat = position.lat;
-            // var lng = position.lng;
-            // var url = place.venue.url;
-            // var rating = place.venue.rating;
-            // var address = position.address;
-            // var coords = `&nbsp${lat} ,  ${lng}`;
-
-            createMarkersForPlaces(self.Venue.lat, self.Venue.lng, self.Venue.name, self.Venue.url, self.Venue.rating, self.Venue.address);
+            createMarkersForPlaces(self.Venue.lat, self.Venue.lng, self.Venue.name, self.Venue.url);
             ViewModel.places.push(self.Venue);
           }
         },
