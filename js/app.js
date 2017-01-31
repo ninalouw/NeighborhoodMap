@@ -271,8 +271,9 @@ function showMarkers(){
     map.fitBounds(bounds);
 }
 
-function hideMarkers (){
-
+function removeMarker(name) {
+    var marker = foursquareVenues[name];
+    marker.setMap(null);
 }
 //This func takes a color and creates anew marker icon of that color.
 //the icon will be 21px wide by 34 high, have an origin of 0, 0
@@ -367,9 +368,7 @@ ViewModel = {
 	    var query = $('#search-bar').val();
       this.getDataForMap();
     },
-    // document.getElementById('show-foursquare').addEventListener('click', function (){
-    //     getFoursquareVenues();
-    // });
+
 
 getDataForMap: function (){
   ViewModel.getFoursquareVenues();
