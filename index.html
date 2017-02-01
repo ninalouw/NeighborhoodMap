@@ -40,6 +40,7 @@
             </div>
             <div>
               <input id="filter-bar" data-bind="value: placeFilter, valueUpdate: 'afterkeydown', event: {keyup: filterPlaces, click: clickOnFilterBar }" type="text" placeholder="Filter places">
+              <input id="filter-button" data-bind="click: filterPlaces, enable: placeFilter" class="btn btn-info" type="button" value="Filter">
             </div>
           </div>
         </div>

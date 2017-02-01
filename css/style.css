@@ -6,10 +6,10 @@ body {
   margin: 0;
   padding: 0;
 }
-.container {
+/*.container {
   height: 100%;
   position: relative;
-}
+}*/
 input {
   font-size: 12px;
 }
@@ -49,6 +49,6 @@ hr {
   line-height: 35px;
   padding: 10px 10px 30px 10px;
   text-align: left;
-  /*width: 300px;*/
-  width: 100%;
+  width: 300px;
+  /*width: 100%;*/
 }

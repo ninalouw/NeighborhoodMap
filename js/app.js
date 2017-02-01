@@ -1,9 +1,7 @@
+
 //Google map
 var map;
 var foursquareVenues = [];
-// Create placemarkers array to use in multiple functions to have control
-// over the number of places that show.
-// var placeMarkers = [];
 
 function initMap() {
 //custom map style
@@ -199,10 +197,21 @@ function initMap() {
     map.mapTypes.set('styled_map', styledMapType);
     map.setMapTypeId('styled_map');
 
-    // var largeInfoWindow = new google.maps.InfoWindow();
-}
+    // Create a single infowindow to be used with the place details information
+    // so that only one is open at once.
+    var infoWindow = new google.maps.InfoWindow({maxWidth: 200});
+
+    function initialize(e) {
+      e.preventDefault;
+      //does an initial onload foursquare query so that map is automatically
+      //populated with locations, as per Udacity instructions
+      ViewModel.getDataForMap(e);
+    }
+
+    google.maps.event.addDomListener(window, 'load', initialize);
 
 //MAP FUNCTIONS
+
 // This function creates markers for each place found when getFoursquareVenues() is successful.
 function createMarkersForPlaces(lat, lng, name, url) {
   //styling the markers
@@ -230,7 +239,8 @@ function createMarkersForPlaces(lat, lng, name, url) {
           marker.addListener('mouseout', function(){
               this.setIcon(defaultIcon);
           });
-           // If a marker is clicked, do a place details search on it in the next function.
+           // If a marker is clicked, open the infoWindow,
+           //which is populated by createInfoWindowContent().
         google.maps.event.addListener(marker, 'click', function() {
                 ViewModel.places().forEach(function(place) {
                     if (place.name.toLowerCase() == marker.name.toLowerCase()) {
@@ -245,9 +255,6 @@ function createMarkersForPlaces(lat, lng, name, url) {
 
 
 function openInfoWindow (place, marker){
-  // Create a single infowindow to be used with the place details information
-  // so that only one is open at once.
-    var infoWindow = new google.maps.InfoWindow();
     var html = place.createInfoWindowContent();
     infoWindow.setContent(html);
     infoWindow.open(map, marker);
@@ -374,17 +381,17 @@ ViewModel = {
     filterPlaces: function() {
         var userInput = ViewModel.placeFilter().toLowerCase();
 
-      ViewModel.places().forEach(function(place){
+        ViewModel.places().forEach(function(place){
         //use Underscore .contains to check if userInput matches a place
-          if (_.contains(place.name.toLowerCase(), userInput)) {
-            console.log('found a match!');
-              showMarker(place.name);
-              place.showPlace(true);
-          } else {
-              hideMarker(place.name);
-              place.showPlace(false);
-          }
-      });
+            if (_.contains(place.name.toLowerCase(), userInput)) {
+              console.log('found a match!');
+                showMarker(place.name);
+                place.showPlace(true);
+            } else {
+                hideMarker(place.name);
+                place.showPlace(false);
+            }
+        });
     },
 
     //user search function - user input of term into foursquare search bar
@@ -406,15 +413,20 @@ ViewModel.places().forEach(function(place){
 ViewModel.places.removeAll();
 
 //get user seach term from search bar
-// var userQuery = document.getElementById('search-bar').value;
-var userQuery = $('#search-bar').val();
+//if, like on initial pageload, there is no search term, use 'food'
+if($('#search-bar').val() === 'undefined' || 'null'){
+  var userQuery = 'food';
+} else {
+  var userQuery = $('#search-bar').val();
+}
+
 //Foursquare AJAX request
 var baseUrl = 'https://api.foursquare.com/v2/venues/explore';
 var clientId = 'QWE1VBCMF05T3J1KBZLJQHAXLGZUWE2Y1N00YANFV0Y3FHD1';
 var clientSecret = 'U43ZC1UCLO50LSYW3OTOSKFSGWFEWJV1Y0VVE3K1ALXAQFXF';
 //later let user set city
 var defaultCity = 'Vancouver, BC';
-// var userQuery = 'food';
+
 
 var foursquareUrl = `${baseUrl}?client_id=${clientId}&client_secret=${clientSecret}&v=20130815&near=${defaultCity}
   &query=${userQuery}`;
@@ -461,3 +473,6 @@ var foursquareUrl = `${baseUrl}?client_id=${clientId}&client_secret=${clientSecr
 }
 
 ko.applyBindings(ViewModel);
+
+//end of initMap
+}
