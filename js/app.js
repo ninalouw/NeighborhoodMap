@@ -414,11 +414,8 @@ ViewModel.places.removeAll();
 
 //get user seach term from search bar
 //if, like on initial pageload, there is no search term, use 'food'
-if($('#search-bar').val() === 'undefined' || 'null'){
-  var userQuery = 'food';
-} else {
-  var userQuery = $('#search-bar').val();
-}
+var userQuery = $('#search-bar').val() || 'food';
+_.defaults(userQuery, 'food');
 
 //Foursquare AJAX request
 var baseUrl = 'https://api.foursquare.com/v2/venues/explore';
