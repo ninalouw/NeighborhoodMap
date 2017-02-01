@@ -34,12 +34,12 @@
           <div class="col m3">
           <div class="options-box">
             <div>
-              <!-- add Knockout bindings -->
+              <!-- added Knockout bindings -->
               <input id="search-bar" data-bind="value: userQuery, valueUpdate:'keypress'" type="text" placeholder="Search Foursquare, ex: 'coffee'">
-              <input id="show-foursquare" data-bind="click:userSearch,enable:userQuery" class="btn btn-primary" type="button" value="Search">
+              <input id="show-foursquare" data-bind="click: userSearch, enable:userQuery" class="btn btn-primary" type="button" value="Search">
             </div>
             <div>
-              <input id="filter-bar" type="text" placeholder="Filter the listings">
+              <input id="filter-bar" data-bind="value: placeFilter, valueUpdate: 'afterkeydown', event: {keyup: filterPlaces, click: clickOnFilterBar }" type="text" placeholder="Filter places">
             </div>
           </div>
         </div>
@@ -54,5 +54,6 @@
     </script>
     <script type="text/javascript" src="js/materialize.min.js"></script>
     <script src="js/knockout.min.js"></script>
+    <script src="js/underscore.js"></script>
   </body>
 </html>

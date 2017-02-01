@@ -199,8 +199,7 @@ function initMap() {
     map.mapTypes.set('styled_map', styledMapType);
     map.setMapTypeId('styled_map');
 
-    var largeInfoWindow = new google.maps.InfoWindow();
-
+    // var largeInfoWindow = new google.maps.InfoWindow();
 }
 
 //MAP FUNCTIONS
@@ -258,23 +257,26 @@ function openInfoWindow (place, marker){
     });
 }
 
-//this func will loop through the markers array and display them all
-function showMarkers(){
+function showMarker(name){
     var bounds = new google.maps.LatLngBounds();
-    // var marker = foursquareLocations[name];
-    var markers = foursquareVenues;
-  //extend boundaries of the map for each marker and display the marker
-    for(var i = 0; i < markers.length; i++){
-        markers[i].setMap(map);
-        bounds.extend(markers[i].position);
-    }
+    var marker = foursquareVenues[name];
+    marker.setVisible(true);
+  //extend boundaries of the map depending on the marker
+    marker.setMap(map);
+    bounds.extend(marker.position);
     map.fitBounds(bounds);
+}
+
+function hideMarker(name){
+    var marker = foursquareVenues[name];
+    marker.setVisible(false);
 }
 
 function removeMarker(name) {
     var marker = foursquareVenues[name];
     marker.setMap(null);
 }
+
 //This func takes a color and creates anew marker icon of that color.
 //the icon will be 21px wide by 34 high, have an origin of 0, 0
 //and be anchored at 10,34.
@@ -332,7 +334,9 @@ var Venue = function (){
             innerHTML += `<p>Price-range:&nbsp${self.price}</p>`;
           }
           if(self.isOpen){
-            innerHTML += `<p>Open now:&nbsp${self.isOpen}</p>`;
+            innerHTML += `<p>Open now:&nbsp Yes</p>`;
+          } else {
+            innerHTML += `<p>Open now:&nbsp No</p>`;
           }
           if(self.address){
             innerHTML += `<p>Address:&nbsp${self.address}</p>`;
@@ -361,12 +365,31 @@ ViewModel = {
     showFilterList: ko.observable(true),
     showFilterErrorList: ko.observable(false),
 
-    //implement Knockout place filter here
+    // Knockout place filter
+    //when user clicks on filter bar close all infowindows
+    clickOnFilterBar: function (){
+        infoWindow.close();
+    },
 
-    //user search function - user input of term into search bar
+    filterPlaces: function() {
+        var userInput = ViewModel.placeFilter().toLowerCase();
+
+      ViewModel.places().forEach(function(place){
+        //use Underscore .contains to check if userInput matches a place
+          if (_.contains(place.name.toLowerCase(), userInput)) {
+            console.log('found a match!');
+              showMarker(place.name);
+              place.showPlace(true);
+          } else {
+              hideMarker(place.name);
+              place.showPlace(false);
+          }
+      });
+    },
+
+    //user search function - user input of term into foursquare search bar
     userSearch: function(){
-	    var query = $('#search-bar').val();
-      this.getDataForMap();
+        this.getDataForMap();
     },
 
 
@@ -376,7 +399,7 @@ getDataForMap: function (){
 
 getFoursquareVenues: function (){
 
-//remove other possible markers here(e.g.hardcoded initial markers)
+//remove other possible markers here(e.g.hardcoded initial markers or previous search results)
 ViewModel.places().forEach(function(place){
   removeMarker(place.name);
 });
