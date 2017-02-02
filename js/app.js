@@ -215,9 +215,9 @@ function initMap() {
 // This function creates markers for each place found when getFoursquareVenues() is successful.
 function createMarkersForPlaces(lat, lng, name, url) {
   //styling the markers
-    var defaultIcon = makeMarkerIcon('00baff');
+    var defaultIcon = makeMarkerIcon('4fc3f7');
   //highlighted marker color for when user hovers over markers
-    var highlightedIcon = makeMarkerIcon('24ffb0');
+    var highlightedIcon = makeMarkerIcon('64ffda');
 
     var latlng = new google.maps.LatLng(lat, lng);
 
@@ -379,19 +379,19 @@ ViewModel = {
     },
 
     filterPlaces: function() {
-        var userInput = ViewModel.placeFilter().toLowerCase();
+        var input = ViewModel.placeFilter().toLowerCase();
 
-        ViewModel.places().forEach(function(place){
-        //use Underscore .contains to check if userInput matches a place
-            if (_.contains(place.name.toLowerCase(), userInput)) {
-              console.log('found a match!');
-                showMarker(place.name);
-                place.showPlace(true);
-            } else {
+        ViewModel.places().forEach(function(place) {
+          //the indexOf method returns -1, so if place.name is < 0
+          //then there was no match to userinput
+            if (place.name.toLowerCase().indexOf(input) < 0) {
                 hideMarker(place.name);
                 place.showPlace(false);
+            } else {
+                showMarker(place.name);
+                place.showPlace(true);
             }
-        });
+        })
     },
 
     //user search function - user input of term into foursquare search bar
@@ -400,76 +400,75 @@ ViewModel = {
     },
 
 
-getDataForMap: function (){
-  ViewModel.getFoursquareVenues();
-},
+    getDataForMap: function (){
+      ViewModel.getFoursquareVenues();
+    },
 
-getFoursquareVenues: function (){
+    getFoursquareVenues: function (){
+    //remove other possible markers here(e.g.hardcoded initial markers or previous search results)
+      ViewModel.places().forEach(function(place){
+          removeMarker(place.name);
+      });
+      ViewModel.places.removeAll();
 
-//remove other possible markers here(e.g.hardcoded initial markers or previous search results)
-ViewModel.places().forEach(function(place){
-  removeMarker(place.name);
-});
-ViewModel.places.removeAll();
+    //get user seach term from search bar
+    //if, like on initial pageload, there is no search term, use 'food'
+        var userQuery = $('#search-bar').val() || 'food';
+        _.defaults(userQuery, 'food');
 
-//get user seach term from search bar
-//if, like on initial pageload, there is no search term, use 'food'
-var userQuery = $('#search-bar').val() || 'food';
-_.defaults(userQuery, 'food');
-
-//Foursquare AJAX request
-var baseUrl = 'https://api.foursquare.com/v2/venues/explore';
-var clientId = 'QWE1VBCMF05T3J1KBZLJQHAXLGZUWE2Y1N00YANFV0Y3FHD1';
-var clientSecret = 'U43ZC1UCLO50LSYW3OTOSKFSGWFEWJV1Y0VVE3K1ALXAQFXF';
-//later let user set city
-var defaultCity = 'Vancouver, BC';
+        //Foursquare AJAX request
+        var baseUrl = 'https://api.foursquare.com/v2/venues/explore';
+        var clientId = 'QWE1VBCMF05T3J1KBZLJQHAXLGZUWE2Y1N00YANFV0Y3FHD1';
+        var clientSecret = 'U43ZC1UCLO50LSYW3OTOSKFSGWFEWJV1Y0VVE3K1ALXAQFXF';
+        //later let user set city
+        var defaultCity = 'Vancouver, BC';
 
 
-var foursquareUrl = `${baseUrl}?client_id=${clientId}&client_secret=${clientSecret}&v=20130815&near=${defaultCity}
-  &query=${userQuery}`;
+        var foursquareUrl = `${baseUrl}?client_id=${clientId}&client_secret=${clientSecret}&v=20130815&near=${defaultCity}
+          &query=${userQuery}`;
 
-  $.ajax({
-        url: foursquareUrl,
-        dataType: "json",
-        success: function(data) {
-          var foursquarePlaces = data.response.groups[0].items;
-          for (var i = 0; i < foursquarePlaces.length; i++) {
-            console.log(foursquarePlaces[i]);
-            var place = foursquarePlaces[i];
-            var venue = place.venue;
+          $.ajax({
+              url: foursquareUrl,
+              dataType: "json",
+              success: function(data) {
+                  var foursquarePlaces = data.response.groups[0].items;
+                  for (var i = 0; i < foursquarePlaces.length; i++) {
+                      console.log(foursquarePlaces[i]);
+                      var place = foursquarePlaces[i];
+                      var venue = place.venue;
 
-            var self = this;
-            self.Venue = new Venue();
+                      var self = this;
+                      self.Venue = new Venue();
 
-            self.Venue.position = venue.location;
-            self.Venue.name = venue.name;
-            self.Venue.lat = venue.location.lat;
-            self.Venue.lng = venue.location.lng;
-            self.Venue.url = venue.url;
-            self.Venue.rating = venue.rating;
-            self.Venue.price = venue.price.message;
-            self.Venue.description = venue.description;
-            self.Venue.address = venue.location.address;
-            self.Venue.photos = venue.photos;
-            self.Venue.contact = venue.contact.formattedPhone;
-            self.Venue.checkinsCount = venue.stats.checkinsCount;
-            self.Venue.isOpen = venue.hours.isOpen;
+                      self.Venue.position = venue.location;
+                      self.Venue.name = venue.name;
+                      self.Venue.lat = venue.location.lat;
+                      self.Venue.lng = venue.location.lng;
+                      self.Venue.url = venue.url;
+                      self.Venue.rating = venue.rating;
+                      self.Venue.price = venue.price.message;
+                      self.Venue.description = venue.description;
+                      self.Venue.address = venue.location.address;
+                      self.Venue.photos = venue.photos;
+                      self.Venue.contact = venue.contact.formattedPhone;
+                      self.Venue.checkinsCount = venue.stats.checkinsCount;
+                      self.Venue.isOpen = venue.hours.isOpen;
 
-            createMarkersForPlaces(self.Venue.lat, self.Venue.lng, self.Venue.name, self.Venue.url);
-            ViewModel.places.push(self.Venue);
-          }
-        },
-    		error: function(xhr, status, err){
-    				console.log(err);
-          }
-  });
+                      createMarkersForPlaces(self.Venue.lat, self.Venue.lng, self.Venue.name, self.Venue.url);
+                        ViewModel.places.push(self.Venue);
+                  }
+              },
+              error: function(xhr, status, err){
+            			console.log(err);
+              }
+          });
 
-}
+    }
 
 //end of ViewModel
 }
 
-ko.applyBindings(ViewModel);
+  ko.applyBindings(ViewModel);
 
 //end of initMap
 }
