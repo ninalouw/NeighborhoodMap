@@ -41,22 +41,33 @@
                 <input id="show-foursquare" data-bind="click: userSearch, enable:userQuery" class="btn btn-primary #1de9b6 teal accent-3" type="button" value="Search">
               </div>
               <div layout="row" flex="none" layout-margin style="color:light-blue">
-                <input id="filter-bar" data-bind="value: placeFilter, valueUpdate: 'afterkeydown', event: { click: clickOnFilterBar }" type="text" placeholder="Filter places">
-                <input id="filter-button" data-bind="click: filterPlaces, enable: placeFilter" class="btn btn-primary #4dd0e1 cyan lighten-2" type="button" value="Filter&nbsp&nbsp">
+                <input id="filter-bar" data-bind="value: placeFilter, valueUpdate: 'afterkeydown', event: { click: clickOnFilterBar }" type="text" placeholder="Filter results">
+                <input id="filter-button" data-bind="click: filterPlaces, enable:placeFilter" class="btn btn-primary #4dd0e1 cyan lighten-2" type="button" value="Filter&nbsp&nbsp">
               </div>
               <div layout="row" flex="none" layout-margin style="color:light-blue">
                 <div id="place-error" data-bind="visible: showFilterErrorList"></div>
              </div>
              <div layout="row" flex="none" layout-margin style="color:light-blue">
-                <ul data-bind="visible: showFilterList, foreach: places, style: { background: '#e0e0e0 grey lighten-2'}">
-                    <li data-bind="visible: showPlace, event: {mouseover: $parent.highlightMarker, mouseout: $parent.unhighlightMarker}, style: { background: selectedVenue() ? '#e0e0e0 grey lighten-2' : '#ffffff white' }">
-                      <strong><span class="place-name" data-bind="text: name"></span></strong>
+                <ul data-bind="visible: showFilterList, foreach: places">
+                    <li data-bind="visible: showPlace, event: {mouseover: $parent.highlightMarker, mouseout: $parent.unhighlightMarker}">
+                      <strong><span class="place-name" data-bind="text: name, style: { color:'#757575'}"></span></strong>
                       <div>Rating: <span data-bind="text: rating"></span></div>
+                    </li>
+                </ul>
+                <ul data-bind="visible: showFilterListResult, foreach: places">
+                    <li data-bind="visible: showPlace, event: {mouseover: $parent.highlightMarker, mouseout: $parent.unhighlightMarker}">
+                      <div><strong><span class="place-name" data-bind="text: name, style: { color:'#757575'}"></span></strong></div>
+                      <span>&nbspPhoto Placeholder</span>
+                      <div>Rating: <span data-bind="text: rating"></span></div>
+                      <div>Open now: <span data-bind="text: isOpen"></span></div>
                       <div>Check-ins: <span data-bind="text: checkinsCount"></span></div>
+                      <div><i>Description<span data-bind="text: description"></span></i></div>
                       <div>Address: <span data-bind="text: address"></span></div>
+                      <div>Phone: <span data-bind="text: contact"></span></div>
                       <span><a data-bind="attr: {href: url}" target=\"_blank\">Website</a></span>
                     </li>
                 </ul>
+
               </div>
             </div>
           </md-content>

@@ -332,9 +332,6 @@ function createMarkersForPlaces(lat, lng, name, url) {
             if (self.name) {
                 innerHTML += `<strong><h6>${self.name}</h6></strong>`;
             }
-            if(self.photo){
-                innerHTML += `<a href=\"${self.photo}\" target=\"_blank\"><img src=\"${self.photo}\" /></a><br>`;
-            }
             if(self.rating){
                 innerHTML += `<p>Rating:&nbsp${self.rating}</p>`;
             }
@@ -349,18 +346,15 @@ function createMarkersForPlaces(lat, lng, name, url) {
             } else {
                 innerHTML += `<p>Open now:&nbsp No</p>`;
             }
-            if(self.address){
-                innerHTML += `<p>Address:&nbsp${self.address}</p>`;
-            }
-            if(self.contact){
-                innerHTML += `<p>Phone number:&nbsp${self.contact}</p>`;
-            }
-            if(self.description){
-                innerHTML += `<p>"&nbsp${self.description}"</p>`;
-            }
-            if(self.url){
-                innerHTML += `<a href=\"${self.url}\" target=\"_blank\">Website</a>`;
-            }
+            // if(self.address){
+            //     innerHTML += `<p>Address:&nbsp${self.address}</p>`;
+            // }
+            // if(self.contact){
+            //     innerHTML += `<p>Phone number:&nbsp${self.contact}</p>`;
+            // }
+            // if(self.url){
+            //     innerHTML += `<a href=\"${self.url}\" target=\"_blank\">Website</a>`;
+            // }
             innerHTML += '</div>';
             return innerHTML;
         };
@@ -375,6 +369,7 @@ function createMarkersForPlaces(lat, lng, name, url) {
         placeFilter: ko.observable([]),
         showFilterList: ko.observable(true),
         showFilterErrorList: ko.observable(false),
+        showFilterListResult: ko.observable(false),
 
         // Knockout place filter
         //when user clicks on filter bar close all infowindows
@@ -394,6 +389,8 @@ function createMarkersForPlaces(lat, lng, name, url) {
                 } else {
                     showMarker(place.name);
                     place.showPlace(true);
+                    ViewModel.showFilterListResult(true);
+                    ViewModel.showFilterList(false);
                     //prevent map from zooming in excessively
                     map.setZoom(16);
                 }
