@@ -30,26 +30,45 @@
       </div>
     </nav>
 
-    <div class="section no-pad-bot" id="index-banner">
+
       <div class="row">
-          <div class="col m3">
-          <div class="options-box">
-            <div>
-              <!-- added Knockout bindings -->
-              <input id="search-bar" data-bind="value: userQuery, valueUpdate:'keypress'" type="text" placeholder="Search Foursquare, ex: 'coffee'">
-              <input id="show-foursquare" data-bind="click: userSearch, enable:userQuery" class="btn btn-primary" type="button" value="Search">
+          <div id="options-box" class="col m3">
+            <!-- making box scroll -->
+          <md-content>
+            <div layout="column" style="height:510px; color: #e0e0e0 grey lighten-2; overflow:auto">
+              <div layout="row" flex="none" layout-margin style="color: light-blue">
+                <input id="search-bar" data-bind="value: userQuery, valueUpdate:'keypress'" type="text" placeholder="Search Foursquare, ex: 'coffee'">
+                <input id="show-foursquare" data-bind="click: userSearch, enable:userQuery" class="btn btn-primary" type="button" value="Search">
+              </div>
+              <div layout="row" flex="none" layout-margin style="color:light-blue">
+                <input id="filter-bar" data-bind="value: placeFilter, valueUpdate: 'afterkeydown', event: {keyup: filterPlaces, click: clickOnFilterBar }" type="text" placeholder="Filter places">
+                <input id="filter-button" data-bind="click: filterPlaces, enable: placeFilter" class="btn btn-info" type="button" value="Filter">
+              </div>
+              <div layout="row" flex="none" layout-margin style="color:light-blue">
+                <div id="place-error" data-bind="visible: showFilterErrorList"></div>
+             </div>
+             <div layout="row" flex="none" layout-margin style="color:light-blue">
+                <ul data-bind="visible: showFilterList, foreach: places, style: { background: '#e0e0e0 grey lighten-2'}">
+                    <li data-bind="visible: showPlace, style: { background: selectedVenue() ? '#e0e0e0 grey lighten-2' : '#ffffff white' }">
+                      <strong><span class="place-name" data-bind="text: name"></span></strong>
+                      <div>Rating: <span data-bind="text: rating"></span></div>
+                      <div>Check-ins: <span data-bind="text: checkinsCount"></span></div>
+                      <div>Price: <span data-bind="text: price"></span></div>
+                      <div>Address: <span data-bind="text: address"></span></div>
+                      <div>Open now: <span data-bind="text: isOpen"></span></div>
+                      <span><a data-bind="attr: {href: url}" target=\"_blank\">Website</a></span>
+                    </li>
+                </ul>
+              </div>
             </div>
-            <div>
-              <input id="filter-bar" data-bind="value: placeFilter, valueUpdate: 'afterkeydown', event: {keyup: filterPlaces, click: clickOnFilterBar }" type="text" placeholder="Filter places">
-              <input id="filter-button" data-bind="click: filterPlaces, enable: placeFilter" class="btn btn-info" type="button" value="Filter">
-            </div>
-          </div>
+          </md-content>
         </div>
+
         <div class="col m9">
           <div id="map"></div>
         </div>
       </div>
-    </div>
+
 
     <script type="text/javascript" src="js/app.js"></script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?libraries=places,drawing,geometry&key=AIzaSyD8r9H4e7ZSpd61gajRZyFiozsFSsB84XE&v=3&callback=initMap">

@@ -326,7 +326,7 @@ var Venue = function (){
           var innerHTML = '';
           innerHTML += '<div>'
           if (self.name) {
-            innerHTML += `<strong><h6>${self.name}</h6></strong> <hr>`;
+            innerHTML += `<strong><h6>${self.name}</h6></strong>`;
           }
           if(self.photo){
             innerHTML += `<a href=\"${self.photo}\" target=\"_blank\"><img src=\"${self.photo}\" /></a><br>`;
