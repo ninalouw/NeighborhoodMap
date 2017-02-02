@@ -37,7 +37,7 @@
           <md-content>
             <div layout="column" style="height:510px; color: #e0e0e0 grey lighten-2; overflow:auto">
               <div layout="row" flex="none" layout-margin style="color: light-blue">
-                <input id="search-bar" data-bind="value: userQuery, valueUpdate:'keypress'" type="text" placeholder="Search Foursquare, ex: 'coffee'">
+                <input id="search-bar" data-bind="value: userQuery, valueUpdate:'keypress', event: { click: clickOnFilterBar }" type="text" placeholder="Search Foursquare, ex: 'coffee'">
                 <input id="show-foursquare" data-bind="click: userSearch, enable:userQuery" class="btn btn-primary #1de9b6 teal accent-3" type="button" value="Search">
               </div>
               <div layout="row" flex="none" layout-margin style="color:light-blue">
@@ -49,7 +49,7 @@
              </div>
              <div layout="row" flex="none" layout-margin style="color:light-blue">
                 <ul data-bind="visible: showFilterList, foreach: places, style: { background: '#e0e0e0 grey lighten-2'}">
-                    <li data-bind="visible: showPlace, style: { background: selectedVenue() ? '#e0e0e0 grey lighten-2' : '#ffffff white' }">
+                    <li data-bind="visible: showPlace, event: {mouseover: $parent.highlightMarker, mouseout: $parent.unhighlightMarker}, style: { background: selectedVenue() ? '#e0e0e0 grey lighten-2' : '#ffffff white' }">
                       <strong><span class="place-name" data-bind="text: name"></span></strong>
                       <div>Rating: <span data-bind="text: rating"></span></div>
                       <div>Check-ins: <span data-bind="text: checkinsCount"></span></div>
