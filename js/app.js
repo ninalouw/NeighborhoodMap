@@ -314,12 +314,17 @@ function createMarkersForPlaces(lat, lng, name, url) {
         self.url = '';
         self.rating = '';
         self.price = '';
-        self.description = '';
         self.address = '';
-        self.photo = '';
         self.contact = '';
         self.checkinsCount = '';
         self.isOpen = '';
+        //from 2nd ajax, for showPlaceDetail
+        self.photoUrl = '';
+        self.description = '';
+        self.categoryName = '';
+        self.ratingColor = '';
+        self.urlFoursquare = '';
+        self.menu = '';
 
         self.selectedVenue = ko.observable(false);
         self.showPlace = ko.observable(true);
@@ -330,32 +335,20 @@ function createMarkersForPlaces(lat, lng, name, url) {
           //build html that will show up in infowindow onclick of marker
             var innerHTML = '';
             innerHTML += '<div>'
-            if (self.name) {
-                innerHTML += `<strong><h6>${self.name}</h6></strong>`;
+            if (self.name && self.price) {
+                innerHTML += `<span><strong><h6>${self.name}</h6></strong></span><span>&nbsp${self.price}</span>`;
             }
             if(self.rating){
                 innerHTML += `<p>Rating:&nbsp${self.rating}</p>`;
-            }
-            if(self.checkinsCount){
-                innerHTML += `<p>Total Check-ins:&nbsp${self.checkinsCount}</p>`;
-            }
-            if(self.price){
-                innerHTML += `<p>Price-range:&nbsp${self.price}</p>`;
             }
             if(self.isOpen){
                 innerHTML += `<p>Open now:&nbsp Yes</p>`;
             } else {
                 innerHTML += `<p>Open now:&nbsp No</p>`;
             }
-            // if(self.address){
-            //     innerHTML += `<p>Address:&nbsp${self.address}</p>`;
-            // }
-            // if(self.contact){
-            //     innerHTML += `<p>Phone number:&nbsp${self.contact}</p>`;
-            // }
-            // if(self.url){
-            //     innerHTML += `<a href=\"${self.url}\" target=\"_blank\">Website</a>`;
-            // }
+            if(self.address){
+                innerHTML += `<p>Address:&nbsp${self.address}</p>`;
+            }
             innerHTML += '</div>';
             return innerHTML;
         };
@@ -456,40 +449,71 @@ function createMarkersForPlaces(lat, lng, name, url) {
 
               $.ajax({
                   url: foursquareUrl,
-                  dataType: "json",
+                  dataType: 'json',
                   success: function(data) {
                       var foursquarePlaces = data.response.groups[0].items;
                       for (var i = 0; i < foursquarePlaces.length; i++) {
-                          console.log(foursquarePlaces[i]);
                           var place = foursquarePlaces[i];
-                          var venue = place.venue;
+                          
+                        // Ajax 2 to get more venue details for showPlaceDetail
+                        //https://api.foursquare.com/v2/venues/VENUE_ID
+                          var baseVenueUrl = 'https://api.foursquare.com/v2/venues/';
+                          var foursquareVenueUrl = `${baseVenueUrl}${foursquarePlaces[i].venue.id}?client_id=${clientId}&client_secret=${clientSecret}&v=20130815`;
 
-                          var self = this;
-                          self.Venue = new Venue();
+                          $.ajax({
+                              url: foursquareVenueUrl,
+                              dataType: "json",
+                              success: function(data) {
+                                  var venue = data.response.venue;
+                                  console.log(venue);
 
-                          self.Venue.position = venue.location;
-                          self.Venue.name = venue.name;
-                          self.Venue.lat = venue.location.lat;
-                          self.Venue.lng = venue.location.lng;
-                          self.Venue.url = venue.url;
-                          self.Venue.rating = venue.rating;
-                          self.Venue.price = venue.price.message;
-                          self.Venue.description = venue.description;
-                          self.Venue.address = venue.location.address;
-                          self.Venue.photos = venue.photos;
-                          self.Venue.contact = venue.contact.formattedPhone;
-                          self.Venue.checkinsCount = venue.stats.checkinsCount;
-                          self.Venue.isOpen = venue.hours.isOpen;
+                                  var self = this;
+                                  self.Venue = new Venue();
 
-                          createMarkersForPlaces(self.Venue.lat, self.Venue.lng, self.Venue.name, self.Venue.url);
-                            ViewModel.places.push(self.Venue);
-                      }
-                  },
+                                  self.Venue.position = venue.location;
+                                  self.Venue.name = venue.name;
+                                  self.Venue.lat = venue.location.lat;
+                                  self.Venue.lng = venue.location.lng;
+                                  self.Venue.url = venue.url;
+                                  self.Venue.rating = venue.rating;
+                                  self.Venue.price = '';
+                                  if (venue.price) {
+                                      tier = venue.price.tier;
+                                      currency = venue.price.currency;
+                                      self.Venue.price = Array(tier+1).join(currency) + " ";
+                                  }
+                                  self.Venue.address = venue.location.address;
+                                  self.Venue.contact = venue.contact.formattedPhone;
+                                  self.Venue.checkinsCount = venue.stats.checkinsCount;
+                                  self.Venue.isOpen = '';
+                                  if(venue.hours.isOpen){
+                                      if(venue.hours.isOpen === 'true'){
+                                          self.Venue.isOpen = 'Yes';
+                                      } else{
+                                          self.Venue.isOpen = 'No';
+                                      }
+                                  }
+                                  self.Venue.photoId = venue.bestPhoto.id;
+                                  self.Venue.photoUrl = venue.bestPhoto.prefix + "100" + venue.bestPhoto.suffix;
+                                  self.Venue.categoryName = venue.categories[0].name;
+                                  self.Venue.ratingColor = "#"+venue.ratingColor;
+                                  self.Venue.description = venue.description;
+                                  self.Venue.urlFoursquare = venue.canonicalUrl ? venue.canonicalUrl : '';
+                                  self.Venue.menu = venue.menu.url;
+
+                                  createMarkersForPlaces(self.Venue.lat, self.Venue.lng, self.Venue.name, self.Venue.url);
+                                    ViewModel.places.push(self.Venue);
+                              },
+                              error: function(response) {
+                                console.log('error:', response);
+                              }
+                          }); // end inner ajax
+                      } //end of for loop
+                  },//end of success
                   error: function(xhr, status, err){
                 			console.log(err);
                   }
-              });
-
+              });//end of ajax 1
         }
 
     //end of ViewModel

@@ -56,15 +56,17 @@
                 </ul>
                 <ul data-bind="visible: showFilterList, foreach: places">
                     <li data-bind="visible: showPlaceDetail, event: {mouseover: $parent.highlightMarker, mouseout: $parent.unhighlightMarker}">
-                      <div><strong><span class="place-name" data-bind="text: name, style: { color:'#757575'}"></span></strong></div>
-                      <span>Photo Placeholder</span>
-                      <div>Rating: <span data-bind="text: rating"></span></div>
-                      <div>Open now: <span data-bind="text: isOpen"></span></div>
+                      <div><strong><span class="place-name" data-bind="text: name, style: { color:'#757575'}"></span></strong>&nbsp&nbsp<span data-bind="text: price"></span></div>
+                      <span><img width="90" height="90" data-bind="attr:{src: photoUrl}" /></span>
+                      <div>Rating:<span data-bind="text: ratingColor"></span> <span data-bind="text: rating"></span></div>
+                      <div><a data-bind="attr: {href: menu}" target=\"_blank\">View Menu</a></div>
                       <div>Check-ins: <span data-bind="text: checkinsCount"></span></div>
-                      <div><i>Description<span data-bind="text: description"></span></i></div>
+                      <div><i>Description: <span data-bind="text: description"></span></i></div>
+                      <div>Category: <span data-bind="text: categoryName"></span></div>
                       <div>Address: <span data-bind="text: address"></span></div>
                       <div>Phone: <span data-bind="text: contact"></span></div>
-                      <span><a data-bind="attr: {href: url}" target=\"_blank\">Website</a></span>
+                      <div><a data-bind="attr: {href: url}" target=\"_blank\">Website</a></div>
+                      <div><a data-bind="attr: {href: urlFoursquare}" target=\"_blank\">Go to place on Foursquare</a></div>
                     </li>
                 </ul>
 
