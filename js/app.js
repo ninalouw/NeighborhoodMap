@@ -339,7 +339,7 @@ function createMarkersForPlaces(lat, lng, name, url) {
                 innerHTML += `<span><strong><h6>${self.name}</h6></strong></span><span>&nbsp${self.price}</span>`;
             }
             if(self.rating){
-                innerHTML += `<p>Rating:&nbsp${self.rating}</p>`;
+                innerHTML += `<div><span><i class="tiny material-icons">star</i></span><span>&nbsp${self.rating}</span></div>`;
             }
             if(self.isOpen){
                 innerHTML += `<p>Open now:&nbsp Yes</p>`;
@@ -454,7 +454,7 @@ function createMarkersForPlaces(lat, lng, name, url) {
                       var foursquarePlaces = data.response.groups[0].items;
                       for (var i = 0; i < foursquarePlaces.length; i++) {
                           var place = foursquarePlaces[i];
-                          
+
                         // Ajax 2 to get more venue details for showPlaceDetail
                         //https://api.foursquare.com/v2/venues/VENUE_ID
                           var baseVenueUrl = 'https://api.foursquare.com/v2/venues/';
@@ -496,7 +496,6 @@ function createMarkersForPlaces(lat, lng, name, url) {
                                   self.Venue.photoId = venue.bestPhoto.id;
                                   self.Venue.photoUrl = venue.bestPhoto.prefix + "100" + venue.bestPhoto.suffix;
                                   self.Venue.categoryName = venue.categories[0].name;
-                                  self.Venue.ratingColor = "#"+venue.ratingColor;
                                   self.Venue.description = venue.description;
                                   self.Venue.urlFoursquare = venue.canonicalUrl ? venue.canonicalUrl : '';
                                   self.Venue.menu = venue.menu.url;

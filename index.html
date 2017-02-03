@@ -12,6 +12,7 @@
     <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!--Import materialize.css-->
     <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!--Let browser know website is optimized for mobile-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   </head>
@@ -41,7 +42,7 @@
                 <input id="show-foursquare" data-bind="click: userSearch, enable:userQuery" class="btn btn-primary #1de9b6 teal accent-3" type="button" value="Search">
               </div>
               <div layout="row" flex="none" layout-margin style="color:light-blue">
-                <input id="filter-bar" data-bind="value: placeFilter, valueUpdate: 'afterkeydown', event: { click: clickOnFilterBar }" type="text" placeholder="Filter results" autofocus>
+                <input id="filter-bar" data-bind="value: placeFilter, valueUpdate: 'afterkeydown', event: { click: clickOnFilterBar }" type="text" placeholder="Filter results for more details" autofocus>
                 <input id="filter-button" data-bind="click: filterPlaces, enable:placeFilter" class="btn btn-primary #4dd0e1 cyan lighten-2" type="button" value="Filter&nbsp&nbsp">
               </div>
               <div layout="row" flex="none" layout-margin style="color:light-blue">
@@ -50,18 +51,17 @@
              <div layout="row" flex="none" layout-margin style="color:light-blue">
                 <ul data-bind="visible: showFilterList, foreach: places">
                     <li data-bind="visible: showPlace, event: {mouseover: $parent.highlightMarker, mouseout: $parent.unhighlightMarker}">
-                      <strong><span class="place-name" data-bind="text: name, style: { color:'#757575'}"></span></strong>
-                      <div>Rating: <span data-bind="text: rating"></span></div>
+                      <span class="place-name" data-bind="text: name"></span>&nbsp&nbsp
+                      <span data-bind="text: rating"></span>&nbsp<span><i class="tiny material-icons">star</i></span>
                     </li>
                 </ul>
                 <ul data-bind="visible: showFilterList, foreach: places">
                     <li data-bind="visible: showPlaceDetail, event: {mouseover: $parent.highlightMarker, mouseout: $parent.unhighlightMarker}">
-                      <div><strong><span class="place-name" data-bind="text: name, style: { color:'#757575'}"></span></strong>&nbsp&nbsp<span data-bind="text: price"></span></div>
+                      <div><span class="place-name" data-bind="text: name"></span>&nbsp&nbsp<span data-bind="text: price"></span>&nbsp<span data-bind="text: rating"></span>&nbsp<span><i class="tiny material-icons">star</i></span></div>
                       <span><img width="90" height="90" data-bind="attr:{src: photoUrl}" /></span>
-                      <div>Rating:<span data-bind="text: ratingColor"></span> <span data-bind="text: rating"></span></div>
                       <div><a data-bind="attr: {href: menu}" target=\"_blank\">View Menu</a></div>
                       <div>Check-ins: <span data-bind="text: checkinsCount"></span></div>
-                      <div><i>Description: <span data-bind="text: description"></span></i></div>
+                      <div><i><span data-bind="text: description"></span></i></div>
                       <div>Category: <span data-bind="text: categoryName"></span></div>
                       <div>Address: <span data-bind="text: address"></span></div>
                       <div>Phone: <span data-bind="text: contact"></span></div>
