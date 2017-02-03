@@ -324,7 +324,6 @@ function createMarkersForPlaces(lat, lng, name, url) {
         self.categoryName = '';
         self.ratingColor = '';
         self.urlFoursquare = '';
-        self.menu = '';
 
         self.selectedVenue = ko.observable(false);
         self.showPlace = ko.observable(true);
@@ -339,12 +338,14 @@ function createMarkersForPlaces(lat, lng, name, url) {
                 innerHTML += `<span><strong><h6>${self.name}</h6></strong></span><span>&nbsp${self.price}</span>`;
             }
             if(self.rating){
-                innerHTML += `<div><span><i class="tiny material-icons">star</i></span><span>&nbsp${self.rating}</span></div>`;
+                innerHTML += `<span>&nbsp${self.rating}</span><span><i class="tiny material-icons">star</i></span>`;
             }
-            if(self.isOpen){
-                innerHTML += `<p>Open now:&nbsp Yes</p>`;
+            if(self.isOpen === 'true'){
+                innerHTML += `<p>Open now</p>`;
+            } else if (self.isOpen === 'hours unavailable') {
+                innerHTML += `<i>&nbsp hours unavailable</i>`;
             } else {
-                innerHTML += `<p>Open now:&nbsp No</p>`;
+                innerHTML += `<p>Closed now</p>`;
             }
             if(self.address){
                 innerHTML += `<p>Address:&nbsp${self.address}</p>`;
@@ -433,8 +434,8 @@ function createMarkersForPlaces(lat, lng, name, url) {
 
         //get user seach term from search bar
         //if, like on initial pageload, there is no search term, use 'food'
-            var userQuery = $('#search-bar').val() || 'food';
-            _.defaults(userQuery, 'food');
+            var userQuery = $('#search-bar').val() || 'restaurant';
+            _.defaults(userQuery, 'restaurant');
 
             //Foursquare AJAX request
             var baseUrl = 'https://api.foursquare.com/v2/venues/explore';
@@ -454,6 +455,7 @@ function createMarkersForPlaces(lat, lng, name, url) {
                       var foursquarePlaces = data.response.groups[0].items;
                       for (var i = 0; i < foursquarePlaces.length; i++) {
                           var place = foursquarePlaces[i];
+                          // console.log(place);
 
                         // Ajax 2 to get more venue details for showPlaceDetail
                         //https://api.foursquare.com/v2/venues/VENUE_ID
@@ -474,32 +476,28 @@ function createMarkersForPlaces(lat, lng, name, url) {
                                   self.Venue.name = venue.name;
                                   self.Venue.lat = venue.location.lat;
                                   self.Venue.lng = venue.location.lng;
-                                  self.Venue.url = venue.url;
+                                  self.Venue.url = venue.url ? venue.url : '';
                                   self.Venue.rating = venue.rating;
                                   self.Venue.price = '';
                                   if (venue.price) {
-                                      tier = venue.price.tier;
-                                      currency = venue.price.currency;
+                                      var tier = venue.price.tier;
+                                      var currency = venue.price.currency;
                                       self.Venue.price = Array(tier+1).join(currency) + " ";
                                   }
                                   self.Venue.address = venue.location.address;
                                   self.Venue.contact = venue.contact.formattedPhone;
                                   self.Venue.checkinsCount = venue.stats.checkinsCount;
                                   self.Venue.isOpen = '';
-                                  if(venue.hours.isOpen){
-                                      if(venue.hours.isOpen === 'true'){
-                                          self.Venue.isOpen = 'Yes';
-                                      } else{
-                                          self.Venue.isOpen = 'No';
-                                      }
+                                  if(venue.hours){
+                                      self.Venue.isOpen = venue.hours.isOpen;
+                                  } else {
+                                      self.Venue.isOpen = 'hours unavailable';
                                   }
                                   self.Venue.photoId = venue.bestPhoto.id;
                                   self.Venue.photoUrl = venue.bestPhoto.prefix + "100" + venue.bestPhoto.suffix;
                                   self.Venue.categoryName = venue.categories[0].name;
                                   self.Venue.description = venue.description;
                                   self.Venue.urlFoursquare = venue.canonicalUrl ? venue.canonicalUrl : '';
-                                  self.Venue.menu = venue.menu.url;
-
                                   createMarkersForPlaces(self.Venue.lat, self.Venue.lng, self.Venue.name, self.Venue.url);
                                     ViewModel.places.push(self.Venue);
                               },
