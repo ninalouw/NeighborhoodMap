@@ -41,7 +41,7 @@
                 <input id="show-foursquare" data-bind="click: userSearch, enable:userQuery" class="btn btn-primary #1de9b6 teal accent-3" type="button" value="Search">
               </div>
               <div layout="row" flex="none" layout-margin style="color:light-blue">
-                <input id="filter-bar" data-bind="value: placeFilter, valueUpdate: 'afterkeydown', event: { click: clickOnFilterBar }" type="text" placeholder="Filter results">
+                <input id="filter-bar" data-bind="value: placeFilter, valueUpdate: 'afterkeydown', event: { click: clickOnFilterBar }" type="text" placeholder="Filter results" autofocus>
                 <input id="filter-button" data-bind="click: filterPlaces, enable:placeFilter" class="btn btn-primary #4dd0e1 cyan lighten-2" type="button" value="Filter&nbsp&nbsp">
               </div>
               <div layout="row" flex="none" layout-margin style="color:light-blue">
@@ -54,10 +54,10 @@
                       <div>Rating: <span data-bind="text: rating"></span></div>
                     </li>
                 </ul>
-                <ul data-bind="visible: showFilterListResult, foreach: places">
-                    <li data-bind="visible: showPlace, event: {mouseover: $parent.highlightMarker, mouseout: $parent.unhighlightMarker}">
+                <ul data-bind="visible: showFilterList, foreach: places">
+                    <li data-bind="visible: showPlaceDetail, event: {mouseover: $parent.highlightMarker, mouseout: $parent.unhighlightMarker}">
                       <div><strong><span class="place-name" data-bind="text: name, style: { color:'#757575'}"></span></strong></div>
-                      <span>&nbspPhoto Placeholder</span>
+                      <span>Photo Placeholder</span>
                       <div>Rating: <span data-bind="text: rating"></span></div>
                       <div>Open now: <span data-bind="text: isOpen"></span></div>
                       <div>Check-ins: <span data-bind="text: checkinsCount"></span></div>

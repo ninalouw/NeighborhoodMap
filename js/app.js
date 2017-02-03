@@ -323,6 +323,7 @@ function createMarkersForPlaces(lat, lng, name, url) {
 
         self.selectedVenue = ko.observable(false);
         self.showPlace = ko.observable(true);
+        self.showPlaceDetail = ko.observable(false);
 
         //func to create content to populate infowindow
         self.createInfoWindowContent = function () {
@@ -388,11 +389,13 @@ function createMarkersForPlaces(lat, lng, name, url) {
                     place.showPlace(false);
                 } else {
                     showMarker(place.name);
-                    place.showPlace(true);
-                    ViewModel.showFilterListResult(true);
-                    ViewModel.showFilterList(false);
+                    place.showPlaceDetail(true);
+                    place.showPlace(false);
+                    ViewModel.showFilterList(true);
                     //prevent map from zooming in excessively
                     map.setZoom(16);
+                    //clear the filter bar
+                    ViewModel.placeFilter('');
                 }
             })
         },
@@ -418,11 +421,14 @@ function createMarkersForPlaces(lat, lng, name, url) {
           //ensure that map zooms out on new search
             map.setZoom(13);
             this.getDataForMap();
+            //clear the search bar
+            this.userQuery('');
         },
 
 
         getDataForMap: function (){
-          ViewModel.getFoursquareVenues();
+            ViewModel.getFoursquareVenues();
+            ViewModel.place.showPlace(true);
         },
 
         getFoursquareVenues: function (){
