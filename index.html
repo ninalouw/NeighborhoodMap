@@ -43,21 +43,21 @@
               </div>
               <div layout="row" flex="none" layout-margin style="color:light-blue">
                 <input id="filter-bar" data-bind="value: placeFilter, valueUpdate: 'afterkeydown', event: { click: clickOnFilterBar }" type="text" placeholder="Filter results for more details" autofocus>
-                <input id="filter-button" data-bind="click: filterPlaces, enable:placeFilter" class="btn btn-primary #4dd0e1 cyan lighten-2" type="button" value="Filter&nbsp&nbsp">
+                <input id="filter-button" data-bind="click: filterPlaces, enable: placeFilter" class="btn btn-primary #4dd0e1 cyan lighten-2" type="button" value="Filter&nbsp&nbsp">
               </div>
               <div layout="row" flex="none" layout-margin style="color:light-blue">
-                <div id="place-error" data-bind="visible: showFilterErrorList"></div>
+                <div id="fsq-errors" data-bind="visible: showFilterErrorList"></div>
              </div>
              <div layout="row" flex="none" layout-margin style="color:light-blue">
                 <ul data-bind="visible: showFilterList, foreach: places">
                     <li data-bind="visible: showPlace, event: {mouseover: $parent.highlightMarker, mouseout: $parent.unhighlightMarker}">
-                      <span class="place-name" data-bind="text: name"></span>&nbsp&nbsp
+                      <span class="venue-name" data-bind="text: name"></span>&nbsp&nbsp
                       <span data-bind="text: rating"></span>&nbsp<span><i class="tiny material-icons">star</i></span>
                     </li>
                 </ul>
                 <ul data-bind="visible: showFilterList, foreach: places">
                     <li data-bind="visible: showPlaceDetail, event: {mouseover: $parent.highlightMarker, mouseout: $parent.unhighlightMarker}">
-                      <div><span class="place-name" data-bind="text: name"></span>&nbsp&nbsp<span data-bind="text: price"></span>&nbsp<span data-bind="text: rating"></span>&nbsp<span><i class="tiny material-icons">star</i></span></div>
+                      <div><span class="venue-name" data-bind="text: name"></span>&nbsp&nbsp<span data-bind="text: price"></span>&nbsp<span data-bind="text: rating"></span>&nbsp<span><i class="tiny material-icons">star</i></span></div>
                       <span><img width="90" height="90" data-bind="attr:{src: photoUrl}" /></span>
                       <div>Check-ins: <span data-bind="text: checkinsCount"></span></div>
                       <div><i><span data-bind="text: description"></span></i></div>

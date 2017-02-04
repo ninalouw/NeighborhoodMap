@@ -361,6 +361,7 @@ function createMarkersForPlaces(lat, lng, name, url) {
         defaultMarkers: ko.observableArray([]),
         places: ko.observableArray([]),
         userQuery: ko.observable(),
+        input: ko.observable(),
         placeFilter: ko.observable([]),
         showFilterList: ko.observable(true),
         showFilterErrorList: ko.observable(false),
@@ -502,13 +503,17 @@ function createMarkersForPlaces(lat, lng, name, url) {
                                     ViewModel.places.push(self.Venue);
                               },
                               error: function(response) {
-                                console.log('error:', response);
+                                console.log('error:', response)
                               }
                           }); // end inner ajax
                       } //end of for loop
                   },//end of success
-                  error: function(xhr, status, err){
-                			console.log(err);
+                  error: function(response) {
+                    ViewModel.showPlace(false);
+                    ViewModel.showPlaceDetail(false);
+                    ViewModel.showFilterErrorList(true);
+                    $('#fsq-errors').text('Failed to get any results from Foursquare: ' + response.statusText + ' (Status Code: ' + response.status + ')');
+                    console.log('error: ', response);
                   }
               });//end of ajax 1
         }
