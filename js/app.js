@@ -324,6 +324,8 @@ function createMarkersForPlaces(lat, lng, name, url) {
         self.categoryName = '';
         self.ratingColor = '';
         self.urlFoursquare = '';
+        self.hoursStatus = '';
+        self.likes = '';
 
         self.selectedVenue = ko.observable(false);
         self.showPlace = ko.observable(true);
@@ -335,20 +337,20 @@ function createMarkersForPlaces(lat, lng, name, url) {
             var innerHTML = '';
             innerHTML += '<div>'
             if (self.name && self.price) {
-                innerHTML += `<span><strong><h6>${self.name}</h6></strong></span><span>&nbsp${self.price}</span>`;
+                innerHTML += `<div><span><strong><h6>${self.name}</h6></strong></span><span>&nbsp${self.price}</span>`;
             }
             if(self.rating){
-                innerHTML += `<span>&nbsp${self.rating}</span><span><i class="tiny material-icons">star</i></span>`;
+                innerHTML += `<span>&nbsp${self.rating}</span><span><i class="tiny material-icons">star</i></span></div>`;
             }
-            if(self.isOpen === 'true'){
-                innerHTML += `<p>Open now</p>`;
+            if(self.isOpen === 'true' && self.hoursStatus){
+                innerHTML += `<p><span><i class="tiny material-icons">schedule</i>Open now</span><span><i>&nbsp${self.hoursStatus}</i></span></p>`;
             } else if (self.isOpen === 'hours unavailable') {
-                innerHTML += `<i>&nbsp hours unavailable</i>`;
+                innerHTML += `<p><span><i class="tiny material-icons">error_outline</i><i>&nbsp Hours unavailable</i></span></p>`;
             } else {
-                innerHTML += `<p>Closed now</p>`;
+                innerHTML += `<p><span><i class="tiny material-icons">today</i><span><i>&nbsp${self.hoursStatus}</i></span></p>`;
             }
             if(self.address){
-                innerHTML += `<p>Address:&nbsp${self.address}</p>`;
+                innerHTML += `<p><i class="tiny material-icons">location_on</i>&nbsp${self.address}</p>`;
             }
             innerHTML += '</div>';
             return innerHTML;
@@ -374,9 +376,13 @@ function createMarkersForPlaces(lat, lng, name, url) {
         },
 
         filterPlaces: function() {
+
             var input = ViewModel.placeFilter().toLowerCase();
 
             ViewModel.places().forEach(function(place) {
+              //if you search for a new term after previous search box does not clear
+              //previous results, thus must set showPlaceDetail to false
+                place.showPlaceDetail(false);
               //the indexOf method returns -1, so if place.name is < 0
               //then there was no match to userinput
                 if (place.name.toLowerCase().indexOf(input) < 0) {
@@ -423,7 +429,6 @@ function createMarkersForPlaces(lat, lng, name, url) {
 
         getDataForMap: function (){
             ViewModel.getFoursquareVenues();
-            ViewModel.place.showPlace(true);
         },
 
         getFoursquareVenues: function (){
@@ -435,8 +440,8 @@ function createMarkersForPlaces(lat, lng, name, url) {
 
         //get user seach term from search bar
         //if, like on initial pageload, there is no search term, use 'food'
-            var userQuery = $('#search-bar').val() || 'restaurant';
-            _.defaults(userQuery, 'restaurant');
+            var userQuery = $('#search-bar').val() || 'food';
+            _.defaults(userQuery, 'food');
 
             //Foursquare AJAX request
             var baseUrl = 'https://api.foursquare.com/v2/venues/explore';
@@ -493,6 +498,18 @@ function createMarkersForPlaces(lat, lng, name, url) {
                                       self.Venue.isOpen = venue.hours.isOpen;
                                   } else {
                                       self.Venue.isOpen = 'hours unavailable';
+                                  }
+                                  self.Venue.hoursStatus = '';
+                                  if(venue.hours){
+                                      self.Venue.hoursStatus = venue.hours.status;
+                                  } else {
+                                      self.Venue.hoursStatus = '';
+                                  }
+                                  self.Venue.likes = '';
+                                  if(venue.likes){
+                                      self.Venue.likes = venue.likes.count;
+                                  } else {
+                                      self.Venue.likes = '';
                                   }
                                   self.Venue.photoId = venue.bestPhoto.id;
                                   self.Venue.photoUrl = venue.bestPhoto.prefix + "100" + venue.bestPhoto.suffix;
