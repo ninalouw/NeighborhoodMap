@@ -202,10 +202,10 @@ function initMap() {
     var infoWindow = new google.maps.InfoWindow({maxWidth: 200});
 
     function initialize(e) {
-      e.preventDefault;
+        e.preventDefault;
       //does an initial onload foursquare query so that map is automatically
       //populated with locations, as per Udacity instructions
-      ViewModel.getDataForMap(e);
+        ViewModel.getDataForMap(e);
     }
 
     google.maps.event.addDomListener(window, 'load', initialize);
@@ -213,50 +213,49 @@ function initMap() {
 //MAP FUNCTIONS
 
 // This function creates markers for each place found when getFoursquareVenues() is successful.
-function createMarkersForPlaces(lat, lng, name, url) {
-  //styling the markers
-    var defaultIcon = makeMarkerIcon('4fc3f7');
-  //highlighted marker color for when user hovers over markers
-    var highlightedIcon = makeMarkerIcon('64ffda');
+    function createMarkersForPlaces(lat, lng, name, url) {
+      //styling the markers
+        var defaultIcon = makeMarkerIcon('4fc3f7');
+      //highlighted marker color for when user hovers over markers
+        var highlightedIcon = makeMarkerIcon('64ffda');
 
-    var latlng = new google.maps.LatLng(lat, lng);
+        var latlng = new google.maps.LatLng(lat, lng);
 
-  // Create a marker for each place.
-    var marker = new google.maps.Marker({
-        map: map,
-        name: name,
-        url: url,
-        position: latlng,
-        icon: defaultIcon,
-        animation: google.maps.Animation.DROP
-    });
-
-  //two eventListeners, one for mouseover and one for mouseout,
-  //to change the colors back and forth
-    marker.addListener('mouseover', function(){
-        this.setIcon(highlightedIcon);
-    });
-    marker.addListener('mouseout', function(){
-        this.setIcon(defaultIcon);
-    });
-    //on dblclick zoom in on marker area
-    marker.addListener('dblclick', function() {
-        map.setZoom(15);
-        map.setCenter(marker.getPosition());
-    });
-           // If a marker is clicked, open the infoWindow,
-           //which is populated by createInfoWindowContent().
-        google.maps.event.addListener(marker, 'click', function() {
-                ViewModel.places().forEach(function(place) {
-                    if (place.name.toLowerCase() == marker.name.toLowerCase()) {
-                        openInfoWindow(place, marker);
-                    }
-                });
+      // Create a marker for each place.
+        var marker = new google.maps.Marker({
+            map: map,
+            name: name,
+            url: url,
+            position: latlng,
+            icon: defaultIcon,
+            animation: google.maps.Animation.DROP
         });
-    foursquareVenues[name] = marker;
-    console.log(marker);
-    return marker;
-}
+
+      //two eventListeners, one for mouseover and one for mouseout,
+      //to change the colors back and forth
+        marker.addListener('mouseover', function(){
+            this.setIcon(highlightedIcon);
+        });
+        marker.addListener('mouseout', function(){
+            this.setIcon(defaultIcon);
+        });
+        //on dblclick zoom in on marker area
+        marker.addListener('dblclick', function() {
+            map.setZoom(15);
+            map.setCenter(marker.getPosition());
+        });
+               // If a marker is clicked, open the infoWindow,
+               //which is populated by createInfoWindowContent().
+        google.maps.event.addListener(marker, 'click', function() {
+            ViewModel.places().forEach(function(place) {
+                if (place.name.toLowerCase() == marker.name.toLowerCase()) {
+                    openInfoWindow(place, marker);
+                }
+            });
+        });
+        foursquareVenues[name] = marker;
+        return marker;
+    }
 
 
     function openInfoWindow (place, marker){
@@ -335,7 +334,7 @@ function createMarkersForPlaces(lat, lng, name, url) {
         self.createInfoWindowContent = function () {
           //build html that will show up in infowindow onclick of marker
             var innerHTML = '';
-            innerHTML += '<div>'
+            innerHTML += '<div>';
             if (self.name && self.price) {
                 innerHTML += `<div><span><strong><h6>${self.name}</h6></strong></span><span>&nbsp${self.price}</span>`;
             }
@@ -398,7 +397,7 @@ function createMarkersForPlaces(lat, lng, name, url) {
                     //clear the filter bar
                     ViewModel.placeFilter('');
                 }
-            })
+            });
         },
 
         highlightMarker: function(place) {
@@ -433,10 +432,10 @@ function createMarkersForPlaces(lat, lng, name, url) {
 
         getFoursquareVenues: function (){
         //remove other possible markers here( initial markers or previous search results)
-          ViewModel.places().forEach(function(place){
-              removeMarker(place.name);
-          });
-          ViewModel.places.removeAll();
+            ViewModel.places().forEach(function(place){
+                removeMarker(place.name);
+            });
+            ViewModel.places.removeAll();
 
         //get user seach term from search bar
         //if, like on initial pageload, there is no search term, use 'food'
@@ -461,7 +460,6 @@ function createMarkersForPlaces(lat, lng, name, url) {
                       var foursquarePlaces = data.response.groups[0].items;
                       for (var i = 0; i < foursquarePlaces.length; i++) {
                           var place = foursquarePlaces[i];
-                          // console.log(place);
 
                         // Ajax 2 to get more venue details for showPlaceDetail
                         //https://api.foursquare.com/v2/venues/VENUE_ID
@@ -470,10 +468,9 @@ function createMarkersForPlaces(lat, lng, name, url) {
 
                           $.ajax({
                               url: foursquareVenueUrl,
-                              dataType: "json",
+                              dataType: 'json',
                               success: function(data) {
                                   var venue = data.response.venue;
-                                  console.log(venue);
 
                                   var self = this;
                                   self.Venue = new Venue();
@@ -517,28 +514,28 @@ function createMarkersForPlaces(lat, lng, name, url) {
                                   self.Venue.description = venue.description;
                                   self.Venue.urlFoursquare = venue.canonicalUrl ? venue.canonicalUrl : '';
                                   createMarkersForPlaces(self.Venue.lat, self.Venue.lng, self.Venue.name, self.Venue.url);
-                                    ViewModel.places.push(self.Venue);
+                                  ViewModel.places.push(self.Venue);
                               },
                               error: function(response) {
-                                console.log('error:', response)
+                                  console.log('error:', response);
                               }
-                          }); // end inner ajax
-                      } //end of for loop
-                  },//end of success
+                          });
+                      }
+                  },
                   error: function(response) {
-                    ViewModel.showPlace(false);
-                    ViewModel.showPlaceDetail(false);
-                    ViewModel.showFilterErrorList(true);
-                    $('#fsq-errors').text('Failed to get any results from Foursquare: ' + response.statusText + ' (Status Code: ' + response.status + ')');
-                    console.log('error: ', response);
+                      ViewModel.showPlace(false);
+                      ViewModel.showPlaceDetail(false);
+                      ViewModel.showFilterErrorList(true);
+                      $('#fsq-errors').text('Failed to get any results from Foursquare: ' + response.statusText + ' (Status Code: ' + response.status + ')');
+                      console.log('error: ', response);
                   }
-              });//end of ajax 1
+              });
         }
 
     //end of ViewModel
-    }
+    };
 
-  ko.applyBindings(ViewModel);
+    ko.applyBindings(ViewModel);
 
 //end of initMap
 }
