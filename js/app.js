@@ -388,7 +388,7 @@ function initMap() {
 
     var ViewModel = {
         places: ko.observableArray([]),
-        userQuery: ko.observable(),
+        userQuery: ko.observable(''),
         input: ko.observable([]),
         showFilterList: ko.observable(true),
         showFilterErrorList: ko.observable(false),
@@ -467,8 +467,9 @@ function initMap() {
 
         //get user seach term from search bar
         //if, like on initial pageload, there is no search term, use 'food'
-            var userQuery = $('#search-bar').val() || 'food';
-            _.defaults(userQuery, 'food');
+            // var userQuery = $('#search-bar').val() || 'food';
+            // _.defaults(userQuery, 'food');
+            var userQuery = ViewModel.userQuery().toLowerCase() || 'food';
 
             //Foursquare AJAX request
             var baseUrl = 'https://api.foursquare.com/v2/venues/explore';

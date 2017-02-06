@@ -36,11 +36,12 @@
           <md-content>
             <div layout="column" style="height:510px; color: #e0e0e0 grey lighten-2; overflow:auto">
               <div layout="row" flex="none" layout-margin style="color: light-blue">
-                <input id="search-bar" data-bind="value: userQuery, valueUpdate:'keypress', event: { click: clickOnFilterBar }" type="text" placeholder="Search Foursquare, ex: 'coffee'">
+                <input id="search-bar" data-bind="textInput: userQuery, event: { click: clickOnFilterBar }" type="text" placeholder="Search Foursquare, ex: 'coffee'">
+
                 <input id="show-foursquare" data-bind="click: userSearch, enable:userQuery" class="btn btn-primary #1de9b6 teal accent-3" type="button" value="Search">
               </div>
               <div layout="row" flex="none" layout-margin >
-                <input placeholder="Filter results…" id="filter-bar" data-bind="value: input, valueUpdate: 'afterkeydown', event: {keyup: filterPlaces, click: clickOnFilterBar}" autocomplete="off">
+                <input placeholder="Filter results by name" id="filter-bar" data-bind="value: input, valueUpdate: 'afterkeydown', event: {keyup: filterPlaces, click: clickOnFilterBar}" autocomplete="off">
               </div>
               <div layout="row" flex="none" layout-margin style="color:light-blue">
                 <div id="fsq-errors" data-bind="visible: showFilterErrorList"></div>
