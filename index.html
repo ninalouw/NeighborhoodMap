@@ -39,36 +39,21 @@
                 <input id="search-bar" data-bind="value: userQuery, valueUpdate:'keypress', event: { click: clickOnFilterBar }" type="text" placeholder="Search Foursquare, ex: 'coffee'">
                 <input id="show-foursquare" data-bind="click: userSearch, enable:userQuery" class="btn btn-primary #1de9b6 teal accent-3" type="button" value="Search">
               </div>
-              <div layout="row" flex="none" layout-margin style="color:light-blue">
-                <input id="filter-bar" data-bind="value: placeFilter, valueUpdate: 'afterkeydown', event: { click: clickOnFilterBar }" type="text" placeholder="Filter results for more details" autofocus>
-                <input id="filter-button" data-bind="click: filterPlaces, enable: placeFilter" class="btn btn-primary #4dd0e1 cyan lighten-2" type="button" value="Filter&nbsp&nbsp">
+              <div layout="row" flex="none" layout-margin >
+                <input placeholder="Filter results…" id="filter-bar" data-bind="value: input, valueUpdate: 'afterkeydown', event: {keyup: filterPlaces, click: clickOnFilterBar}" autocomplete="off">
               </div>
               <div layout="row" flex="none" layout-margin style="color:light-blue">
                 <div id="fsq-errors" data-bind="visible: showFilterErrorList"></div>
              </div>
-             <div layout="row" flex="none" layout-margin style="color:light-blue">
-                <ul data-bind="visible: showFilterList, foreach: places">
+
+             <div layout="row" flex="none">
+                <ul data-bind="visible: showFilterList, foreach:places">
                     <li data-bind="visible: showPlace, event: {mouseover: $parent.highlightMarker, mouseout: $parent.unhighlightMarker}">
+                      <span><img width="30" height="30" data-bind="attr:{src: photoUrl}" /></span>
                       <span class="venue-name" data-bind="text: name"></span>&nbsp&nbsp
                       <span data-bind="text: rating"></span>&nbsp<span><i class="tiny material-icons">star</i></span>
                     </li>
                 </ul>
-                <ul data-bind="visible: showFilterList, foreach: places">
-                    <li data-bind="visible: showPlaceDetail, event: {mouseover: $parent.highlightMarker, mouseout: $parent.unhighlightMarker}">
-                      <div><span class="venue-name" data-bind="text: name"></span>&nbsp&nbsp<span data-bind="text: price"></span>&nbsp<span data-bind="text: rating"></span>&nbsp<span><i class="material-icons">star</i></span></div>
-                      <span><img width="120" height="100" data-bind="attr:{src: photoUrl}" /></span>
-                      <div><i class="material-icons">person_pin</i> &nbsp<span data-bind="text: checkinsCount"></span></div>
-                      <div><i class="material-icons">thumb_up</i> &nbsp<span data-bind="text: likes"></span></div>
-                      <div><i><span data-bind="text: description"></span></i></div>
-                      <div><i class="material-icons">local_dining</i> &nbsp<span data-bind="text: categoryName"></span></div>
-                      <div><i class="material-icons">location_on</i> &nbsp<span data-bind="text: address"></span></div>
-                      <div><i class="material-icons">today</i> &nbsp<span data-bind="text: hoursStatus"></span></div>
-                      <div><i class="material-icons">phone</i> &nbsp<span data-bind="text: contact"></span></div>
-                      <div><i class="material-icons">link</i> &nbsp<a data-bind="attr: {href: url}" target=\"_blank\">Website</a></div>
-                      <div><i class="material-icons">rate_review</i> &nbsp<a data-bind="attr: {href: urlFoursquare}" target=\"_blank\">View place on Foursquare</a></div>
-                    </li>
-                </ul>
-
               </div>
             </div>
           </md-content>

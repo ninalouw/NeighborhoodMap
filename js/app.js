@@ -231,14 +231,15 @@ function initMap() {
             animation: google.maps.Animation.DROP
         });
 
-      //two eventListeners, one for mouseover and one for mouseout,
-      //to change the colors back and forth
+      // //two eventListeners, one for mouseover and one for mouseout,
+      // //to change the colors back and forth
         marker.addListener('mouseover', function(){
             this.setIcon(highlightedIcon);
         });
         marker.addListener('mouseout', function(){
             this.setIcon(defaultIcon);
         });
+
         //on dblclick zoom in on marker area
         marker.addListener('dblclick', function() {
             map.setZoom(15);
@@ -252,6 +253,12 @@ function initMap() {
                     openInfoWindow(place, marker);
                 }
             });
+
+            marker.setAnimation(google.maps.Animation.BOUNCE);
+            setTimeout(function(){
+               marker.setAnimation(null);
+            }, 2150);
+
         });
         foursquareVenues[name] = marker;
         return marker;
@@ -268,6 +275,14 @@ function initMap() {
         });
     }
 
+    function toggleBounce(marker) {
+        if (marker.getAnimation() !== null) {
+            marker.setAnimation(null);
+        } else {
+            marker.setAnimation(google.maps.Animation.BOUNCE);
+        }
+    }
+
     function showMarker(name){
         var bounds = new google.maps.LatLngBounds();
         var marker = foursquareVenues[name];
@@ -276,6 +291,10 @@ function initMap() {
         marker.setMap(map);
         bounds.extend(marker.position);
         map.fitBounds(bounds);
+        // using a window resize event and fitBounds method to make sure map markers always fit on screen as user resizes their browser window
+        google.maps.event.addDomListener(window, 'resize', function() {
+            map.fitBounds(bounds);
+        });
     }
 
     function hideMarker(name){
@@ -328,19 +347,27 @@ function initMap() {
 
         self.selectedVenue = ko.observable(false);
         self.showPlace = ko.observable(true);
-        self.showPlaceDetail = ko.observable(false);
+        // self.showPlaceDetail = ko.observable(false);
 
         //func to create content to populate infowindow
         self.createInfoWindowContent = function () {
+            var name, price, rating,likes, isOpen, hoursStatus, address, checkinsCount, photoUrl, contact, url, urlFoursquare;
+            name = self.name || 'No name provided.';
+            price = self.price || 'No price information.';
+            rating = self.rating || 'No rating provided.';
+            likes = self.likes || '';
+            address = self.address || 'No address provided.';
+            checkinsCount = self.checkinsCount || '';
+            photoUrl = self.photoUrl || '';
+            contact = self.contact || 'No contact details provided.';
+            url = self.url || '';
+            urlFoursquare = self.urlFoursquare || '';
           //build html that will show up in infowindow onclick of marker
             var innerHTML = '';
             innerHTML += '<div>';
-            if (self.name && self.price) {
-                innerHTML += `<div><span><strong><h6>${self.name}</h6></strong></span><span>&nbsp${self.price}</span>`;
-            }
-            if(self.rating){
-                innerHTML += `<span>&nbsp${self.rating}</span><span><i class="tiny material-icons">star</i></span></div>`;
-            }
+            innerHTML += `<div><span><strong><h6>${name}</h6></strong></span><span>&nbsp${price}</span></div>`;
+            innerHTML += `<span><img style="width:80px;height:80px;" src="${photoUrl}" /></span>`;
+            innerHTML += `<div><span>&nbsp${rating}</span><i class="tiny material-icons">star</i><span>&nbsp${likes}</span>&nbsp<i class="tiny material-icons">thumb_up</i><span>&nbsp${checkinsCount}</span>&nbsp<i class="tiny material-icons">person_pin</i></div>`;
             if(self.isOpen === 'true' && self.hoursStatus){
                 innerHTML += `<p><span><i class="tiny material-icons">schedule</i>Open now</span><span><i>&nbsp${self.hoursStatus}</i></span></p>`;
             } else if (self.isOpen === 'hours unavailable') {
@@ -348,22 +375,21 @@ function initMap() {
             } else {
                 innerHTML += `<p><span><i class="tiny material-icons">today</i><span><i>&nbsp${self.hoursStatus}</i></span></p>`;
             }
-            if(self.address){
-                innerHTML += `<p><i class="tiny material-icons">location_on</i>&nbsp${self.address}</p>`;
-            }
+            innerHTML += `<p><i class="tiny material-icons">location_on</i>&nbsp${address}</p>`;
+            innerHTML += `<p><i class="tiny material-icons">phone</i>&nbsp${contact}</p>`;
+            innerHTML += `<div><i class="material-icons">link</i> &nbsp<a href="${url}" target=\"_blank\">Website</a></div>`;
+            innerHTML += `<div><i class="material-icons">rate_review</i> &nbsp<a href="${urlFoursquare}" target=\"_blank\">View on Foursquare</a></div>`;
             innerHTML += '</div>';
             return innerHTML;
         };
     };
 
 
-    ViewModel = {
-      //can later change hardcoded defaultMarkers to markers populated from an api call.
-        defaultMarkers: ko.observableArray([]),
+
+    var ViewModel = {
         places: ko.observableArray([]),
         userQuery: ko.observable(),
-        input: ko.observable(),
-        placeFilter: ko.observable([]),
+        input: ko.observable([]),
         showFilterList: ko.observable(true),
         showFilterErrorList: ko.observable(false),
         showFilterListResult: ko.observable(false),
@@ -376,28 +402,28 @@ function initMap() {
 
         filterPlaces: function() {
 
-            var input = ViewModel.placeFilter().toLowerCase();
+            var input = ViewModel.input().toLowerCase();
 
             ViewModel.places().forEach(function(place) {
-              //if you search for a new term after previous search box does not clear
-              //previous results, thus must set showPlaceDetail to false
-                place.showPlaceDetail(false);
-              //the indexOf method returns -1, so if place.name is < 0
-              //then there was no match to userinput
                 if (place.name.toLowerCase().indexOf(input) < 0) {
                     hideMarker(place.name);
                     place.showPlace(false);
                 } else {
                     showMarker(place.name);
-                    place.showPlaceDetail(true);
-                    place.showPlace(false);
-                    ViewModel.showFilterList(true);
-                    //prevent map from zooming in excessively
-                    map.setZoom(16);
-                    //clear the filter bar
-                    ViewModel.placeFilter('');
+                    place.showPlace(true);
+                    // //prevent map from zooming in excessively
+                    map.setZoom(13);
                 }
             });
+        },
+
+        searchOnEnter: function(data, event) {
+            var keyCode = (event.which ? event.which : event.keyCode);
+            if (keyCode === 13) {
+                this.getDataForMap();
+                return false;
+            }
+            return true;
         },
 
         highlightMarker: function(place) {
@@ -407,6 +433,7 @@ function initMap() {
             var position = marker.getPosition();
             openInfoWindow(place, marker);
             marker.setIcon(highlightedIcon);
+            toggleBounce(marker);
         },
 
         unhighlightMarker: function(place) {
@@ -414,6 +441,7 @@ function initMap() {
             this.selectedVenue(false);
             var marker = foursquareVenues[this.name];
             marker.setIcon(defaultIcon);
+            toggleBounce(marker);
         },
 
         //user search function - user input of term into foursquare search bar
@@ -422,7 +450,7 @@ function initMap() {
             map.setZoom(13);
             this.getDataForMap();
             //clear the search bar
-            this.userQuery('');
+            // this.userQuery('');
         },
 
 
@@ -513,8 +541,11 @@ function initMap() {
                                   self.Venue.categoryName = venue.categories[0].name;
                                   self.Venue.description = venue.description;
                                   self.Venue.urlFoursquare = venue.canonicalUrl ? venue.canonicalUrl : '';
+
                                   createMarkersForPlaces(self.Venue.lat, self.Venue.lng, self.Venue.name, self.Venue.url);
+
                                   ViewModel.places.push(self.Venue);
+                                  console.log(self.Venue);
                               },
                               error: function(response) {
                                   console.log('error:', response);
@@ -535,7 +566,9 @@ function initMap() {
     //end of ViewModel
     };
 
+
     ko.applyBindings(ViewModel);
+
 
 //end of initMap
 }
