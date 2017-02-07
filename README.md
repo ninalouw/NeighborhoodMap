@@ -1,16 +1,41 @@
 # NeighborhoodMap
-Single-page app built with Knockout.js using Google Maps API for Udacity Frontend Nanodegree.
+Single-page app built with Knockout.js using Google Maps API and Foursquare API.
 
-## Project Overview
+## Instructions
+
+1. Clone or download the repo.
+2. Open index.html in your browser to view the app.
+3. Or, you can set up a local server following [these](https://developer.mozilla.org/en-US/docs/Learn/Common_questions/Set_up_a_basic_working_environment) instructions.
+4. View the app [here]().
+
+## Project Brief
 You will develop a single page application featuring a map of your neighborhood or a neighborhood you would like to visit. You will then add functionality to this map including highlighted locations, third-party data about those locations and various ways to browse the content.
 
-1. Knockout must be used to handle the list, filter, and any other information on the page that is subject to changing state.
-2. Asynchrony and Error Handling. Note that all data APIs used in the project should load asynchronously and errors should be handled gracefully.
-3. Write code required to add a full-screen map to your page using the Google Maps API.
-4. Write code required to display map markers identifying at least 5 locations that you are interested in within this neighborhood. Your app should display those locations by default when the page is loaded.
-5. Implement a list view of the set of locations defined in step 4.
-6. Provide a filter option that uses an input field to filter both the list view and the map markers displayed by default on load. The list view and the markers should update accordingly in real time.
-7. Add functionality using third-party APIs to provide information when a map marker or list view entry is clicked (ex: Yelp reviews, Wikipedia, Flickr images, etc).
-8. Add functionality to animate a map marker when either the list item associated with it or the map marker itself is selected.
-9. Add functionality to open an infoWindow with the information described in step 8 when either a location is selected from the list view or its map marker is selected directly.
-10. The app's interface should be intuitive to use.
+## Project Description
+This is a single-page application built using Google Maps API for the map and map functionality, and Foursquare API for the data used to create markers on the map and display more detailed information about these places. The app uses the framework Knockout.js and utilizes the MVVM pattern for the app architecture and for a responsive UI.
+
+## How to use the app
+
+* By default, the app loads top-rated places from Foursquare for your location, in the list right next to the map (laptop/desktop) or under the map (smartphone).
+
+* You can filter the list of places by typing a search string that matches the places title in the list, and as you backspace the list will update to show you the previous list results.
+
+* When you hover over a list entry, the corresponding map marker will animate and an info window opens with more details about the place built from  available Foursquare data.
+
+* When you click on a marker it will animate and open the info window for the place.
+
+* In the top search bar you can enter in your own queries, e.g. 'coffee', 'pizza' etc, and see the results come up in the list view and on the map.
+
+## Project Resources
+
+* [Knockout Documentation] (http://knockoutjs.com/index.html).
+* [Knockout Live Tutorials] (http://learn.knockoutjs.com/#/?tutorial=loadingsaving).
+* [Udemy Knockout Course] (https://www.udemy.com/learn-knockout-js-framework-from-groundup/learn/v4/overview).
+* [KO Live Search] (http://opensoul.org/2011/06/23/live-search-with-knockoutjs/).
+* [Utility Functions in Knockout.js] (http://www.knockmeout.net/2011/04/utility-functions-in-knockoutjs.html).
+* [Asynchronous Error-Handling in JavaScript] (https://ruben.verborgh.org/blog/2012/12/31/asynchronous-error-handling-in-javascript/).
+* [Google Maps API] (https://developers.google.com/maps/).
+* [Google Maps API Documentation] (https://developers.google.com/maps/documentation/).
+* [Foursquare API] (https://developer.foursquare.com/).
+* [Foursquare API Documentation] (https://developer.foursquare.com/docs/).
+* [Materialize CSS] (http://materializecss.com/).

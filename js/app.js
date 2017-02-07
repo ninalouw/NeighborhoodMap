@@ -258,7 +258,7 @@ function initMap() {
 
             marker.setAnimation(google.maps.Animation.BOUNCE);
             setTimeout(function(){
-               marker.setAnimation(null);
+                marker.setAnimation(null);
             }, 2150);
 
         });
@@ -560,8 +560,8 @@ function initMap() {
                                   ViewModel.places.push(self.Venue);
                               },
                               error: function(response) {
-                                ViewModel.error('Failed to get any results from Foursquare.');
-                                ViewModel.showFilterErrorList(true);
+                                  ViewModel.error('Failed to get any results from Foursquare.');
+                                  ViewModel.showFilterErrorList(true);
                                   console.log('error:', response);
                               }
                           });
@@ -582,11 +582,11 @@ function initMap() {
     ko.applyBindings(ViewModel);
 
 // Initialize collapse button
-$(".button-collapse").sideNav();
+    $(".button-collapse").sideNav();
 
 //end of initMap
 }
 //Error callback for GMap API request
- mapError = () => {
-   $('#fsq-errors').text('Failed to load Google Maps.');
- };
+mapError = () => {
+    $('#fsq-errors').text('Failed to load Google Maps.');
+};
