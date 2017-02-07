@@ -193,6 +193,7 @@ function initMap() {
                 'styled_map']
         }
     });
+
     //Associate the styled map with the MapTypeId and set it to display.
     map.mapTypes.set('styled_map', styledMapType);
     map.setMapTypeId('styled_map');
@@ -206,6 +207,7 @@ function initMap() {
       //does an initial onload foursquare query so that map is automatically
       //populated with locations, as per Udacity instructions
         ViewModel.getDataForMap(e);
+        ViewModel.showFilterErrorList(false);
     }
 
     google.maps.event.addDomListener(window, 'load', initialize);
@@ -486,7 +488,13 @@ function initMap() {
                   dataType: 'json',
                   success: function(data) {
                       var foursquarePlaces = data.response.groups[0].items;
+                      //error handling for no search results for userQuery
+                      if(foursquarePlaces.length === 0) {
+                          ViewModel.error('There were no results for your search query.');
+                          ViewModel.showFilterErrorList(true);
+                      }
                       for (var i = 0; i < foursquarePlaces.length; i++) {
+                          ViewModel.showFilterErrorList(false);
                           var place = foursquarePlaces[i];
 
                         // Ajax 2 to get more venue details for showPlaceDetail
@@ -576,3 +584,7 @@ function initMap() {
 
 //end of initMap
 }
+//Error callback for GMap API request
+ mapError = () => {
+   $('#fsq-errors').text('Failed to load Google Maps.');
+ };
