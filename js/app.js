@@ -581,6 +581,8 @@ function initMap() {
 
     ko.applyBindings(ViewModel);
 
+// Initialize collapse button
+$(".button-collapse").sideNav();
 
 //end of initMap
 }

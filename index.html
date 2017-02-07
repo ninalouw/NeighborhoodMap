@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
     <script src="js/jquery-3.1.1.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min.js"></script>
     <!--Import Google Icon Font-->
     <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!--Import materialize.css-->
@@ -17,59 +17,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   </head>
   <body>
-    <nav class="light-pink lighten-1" role="navigation">
-      <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo"><i class="material-icons">location_on</i>FoodExplorer</a>
-        <ul class="right hide-on-med-and-down">
-        </ul>
+      <!-- Navbar -->
+      <nav class="light-pink lighten-1" role="navigation">
+        <div class="nav-wrapper container pull right"><a id="logo-container" href="#" class="brand-logo"><i class="material-icons">location_on</i>FoodExplorer</a>
+          <ul id="nav-mobile" class="side-nav">
+            <li><a href="#">Navbar Link</a></li>
+          </ul>
+            <a href="#" data-activates="slide-out" class="button-collapse"><i class="material-icons">menu</i></a>
+        </div>
+      </nav>
 
-        <ul id="nav-mobile" class="side-nav">
-          <li><a href="#">Navbar Link</a></li>
-        </ul>
-        <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
-      </div>
-    </nav>
-
-
-      <div class="row">
-          <div id="options-box" class="col m3">
-            <!-- making box scroll -->
-          <md-content>
-            <div layout="column" style="height:510px; overflow:auto">
-              <div layout="row" flex="none" layout-margin >
-                <input id="search-bar" data-bind="textInput: userQuery, event: { click: clickOnFilterBar }" type="text" placeholder="Search Foursquare, ex: 'coffee'">
-
-                <input id="show-foursquare" data-bind="click: userSearch, enable:userQuery" class="btn btn-primary #1de9b6 teal accent-3" type="button" value="Search">
-              </div>
-              <div layout="row" flex="none" layout-margin >
-                <input placeholder="Filter results by name" id="filter-bar" data-bind="value: input, valueUpdate: 'afterkeydown', event: {keyup: filterPlaces, click: clickOnFilterBar}" autocomplete="off">
-              </div>
-              <div layout="row" flex="none" layout-margin >
-              <strong><div id="fsq-errors" data-bind="visible: showFilterErrorList, text: error"></div></strong>
+    <aside>
+        <div class="row">
+          <!-- SideBar -->
+            <ul id="slide-out" class="side-nav fixed">
+              <div id="options-box" class="col s12 m4 l3">
+                  <md-content>
+                    <div layout="column" style="height:510px; overflow:auto">
+                      <div layout="row" flex="none" layout-margin >
+                          <input id="search-bar" data-bind="textInput: userQuery, event: { click: clickOnFilterBar }" type="text" placeholder="Search Foursquare, ex: 'coffee'">
+                          <input id="show-foursquare" data-bind="click: userSearch, enable:userQuery" class="btn btn-primary #1de9b6 teal accent-3" type="button" value="Search">
+                      </div>
+                      <div layout="row" flex="none" layout-margin >
+                          <input placeholder="Filter results by name" id="filter-bar" data-bind="value: input, valueUpdate: 'afterkeydown', event: {keyup: filterPlaces, click: clickOnFilterBar}" autocomplete="off">
+                      </div>
+                      <div layout="row" flex="none" layout-margin >
+                          <strong><div id="fsq-errors" data-bind="visible: showFilterErrorList, text: error"></div></strong>
+                     </div>
+                     <div layout="row" flex="none">
+                          <ul data-bind="visible: showFilterList, foreach:places">
+                              <li data-bind="visible: showPlace, event: {mouseover: $parent.highlightMarker, mouseout: $parent.unhighlightMarker}">
+                                  <span><img width="25" height="25" data-bind="attr:{src: photoUrl}" /></span>
+                                  <span class="venue-name" data-bind="text: name"></span>&nbsp&nbsp
+                                  <span data-bind="text: rating"></span>&nbsp<span><i class="tiny material-icons">star</i></span>
+                              </li>
+                          </ul>
+                      </div>
+                    </div>
+                </md-content>
              </div>
-             <div layout="row" flex="none">
-                <ul data-bind="visible: showFilterList, foreach:places">
-                    <li data-bind="visible: showPlace, event: {mouseover: $parent.highlightMarker, mouseout: $parent.unhighlightMarker}">
-                      <span><img width="30" height="30" data-bind="attr:{src: photoUrl}" /></span>
-                      <span class="venue-name" data-bind="text: name"></span>&nbsp&nbsp
-                      <span data-bind="text: rating"></span>&nbsp<span><i class="tiny material-icons">star</i></span>
-                    </li>
-                </ul>
-              </div>
+            </ul>
+        </aside>
+            <main>
+            <!-- Map -->
+            <div class="col s12 m8 l9">
+              <div style="height:100%; width: 100%;" id="map"></div>
             </div>
-          </md-content>
-        </div>
-
-        <div style="height:100%; width: 100%;" class="col m9">
-          <div id="map"></div>
-        </div>
       </div>
+           </main>
 
-
-    <script src="js/app.js"></script>
-    <script src="js/materialize.min.js"></script>
-    <script src="js/knockout.min.js"></script>
-    <script src="js/underscore.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?libraries=places,drawing,geometry&key=AIzaSyD8r9H4e7ZSpd61gajRZyFiozsFSsB84XE&v=3&callback=initMap" async defer onerror="mapError()">
-    </script>
+      <script src="js/app.js"></script>
+      <script src="js/materialize.min.js"></script>
+      <script src="js/knockout.min.js"></script>
+      <script src="js/underscore.js"></script>
+      <script src="https://maps.googleapis.com/maps/api/js?libraries=places,drawing,geometry&key=AIzaSyD8r9H4e7ZSpd61gajRZyFiozsFSsB84XE&v=3&callback=initMap" async defer onerror="mapError()">
+      </script>
   </body>
 </html>
