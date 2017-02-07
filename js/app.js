@@ -365,9 +365,9 @@ function initMap() {
           //build html that will show up in infowindow onclick of marker
             var innerHTML = '';
             innerHTML += '<div>';
-            innerHTML += `<div><span><strong><h6>${name}</h6></strong></span><span>&nbsp${price}</span></div>`;
-            innerHTML += `<span><img style="width:80px;height:80px;" src="${photoUrl}" /></span>`;
-            innerHTML += `<div><span>&nbsp${rating}</span><i class="tiny material-icons">star</i><span>&nbsp${likes}</span>&nbsp<i class="tiny material-icons">thumb_up</i><span>&nbsp${checkinsCount}</span>&nbsp<i class="tiny material-icons">person_pin</i></div>`;
+            innerHTML += `<div><span><strong><h6>${name}</h6></strong></span></div>`;
+            innerHTML += `<span><img style="width:70px;height:60px;" src="${photoUrl}" /></span>`;
+            innerHTML += `<div><span>&nbsp${price}</span>&nbsp<span>&nbsp${rating}</span><i class="tiny material-icons">star</i><span>&nbsp${likes}</span>&nbsp<i class="tiny material-icons">thumb_up</i><span>&nbsp${checkinsCount}</span>&nbsp<i class="tiny material-icons">person_pin</i></div>`;
             if(self.isOpen === 'true' && self.hoursStatus){
                 innerHTML += `<p><span><i class="tiny material-icons">schedule</i>Open now</span><span><i>&nbsp${self.hoursStatus}</i></span></p>`;
             } else if (self.isOpen === 'hours unavailable') {
@@ -392,6 +392,7 @@ function initMap() {
         input: ko.observable([]),
         showFilterList: ko.observable(true),
         showFilterErrorList: ko.observable(false),
+        error: ko.observable(''),
         showFilterListResult: ko.observable(false),
 
         // Knockout place filter
@@ -450,7 +451,7 @@ function initMap() {
             map.setZoom(13);
             this.getDataForMap();
             //clear the search bar
-            // this.userQuery('');
+            this.userQuery('');
         },
 
 
@@ -467,8 +468,6 @@ function initMap() {
 
         //get user seach term from search bar
         //if, like on initial pageload, there is no search term, use 'food'
-            // var userQuery = $('#search-bar').val() || 'food';
-            // _.defaults(userQuery, 'food');
             var userQuery = ViewModel.userQuery().toLowerCase() || 'food';
 
             //Foursquare AJAX request
@@ -504,21 +503,21 @@ function initMap() {
                                   var self = this;
                                   self.Venue = new Venue();
 
-                                  self.Venue.position = venue.location;
-                                  self.Venue.name = venue.name;
-                                  self.Venue.lat = venue.location.lat;
-                                  self.Venue.lng = venue.location.lng;
-                                  self.Venue.url = venue.url ? venue.url : '';
-                                  self.Venue.rating = venue.rating;
+                                  self.Venue.position = venue.location || 'No location provided';
+                                  self.Venue.name = venue.name || 'No name provided';
+                                  self.Venue.lat = venue.location.lat || '';
+                                  self.Venue.lng = venue.location.lng || '';
+                                  self.Venue.url = venue.url || 'No url provided';
+                                  self.Venue.rating = venue.rating || 'No rating provided';
                                   self.Venue.price = '';
                                   if (venue.price) {
                                       var tier = venue.price.tier;
                                       var currency = venue.price.currency;
-                                      self.Venue.price = Array(tier+1).join(currency) + " ";
+                                      self.Venue.price = Array(tier+1).join(currency) + '';
                                   }
-                                  self.Venue.address = venue.location.address;
-                                  self.Venue.contact = venue.contact.formattedPhone;
-                                  self.Venue.checkinsCount = venue.stats.checkinsCount;
+                                  self.Venue.address = venue.location.address || 'No address provided';
+                                  self.Venue.contact = venue.contact.formattedPhone || 'No contact details provided';
+                                  self.Venue.checkinsCount = venue.stats.checkinsCount || 'No Check-in data';
                                   self.Venue.isOpen = '';
                                   if(venue.hours){
                                       self.Venue.isOpen = venue.hours.isOpen;
@@ -535,30 +534,34 @@ function initMap() {
                                   if(venue.likes){
                                       self.Venue.likes = venue.likes.count;
                                   } else {
-                                      self.Venue.likes = '';
+                                      self.Venue.likes = 'No likes provided';
                                   }
-                                  self.Venue.photoId = venue.bestPhoto.id;
-                                  self.Venue.photoUrl = venue.bestPhoto.prefix + "100" + venue.bestPhoto.suffix;
-                                  self.Venue.categoryName = venue.categories[0].name;
-                                  self.Venue.description = venue.description;
-                                  self.Venue.urlFoursquare = venue.canonicalUrl ? venue.canonicalUrl : '';
+                                  self.Venue.photoUrl = '';
+                                  if(venue.bestPhoto){
+                                      self.Venue.photoUrl = venue.bestPhoto.prefix + "100" + venue.bestPhoto.suffix ;
+                                  } else {
+                                      self.Venue.photoUrl = '';
+                                  }
+
+                                  self.Venue.categoryName = venue.categories[0].name || '';
+                                  self.Venue.description = venue.description || '';
+                                  self.Venue.urlFoursquare = venue.canonicalUrl || '';
 
                                   createMarkersForPlaces(self.Venue.lat, self.Venue.lng, self.Venue.name, self.Venue.url);
 
                                   ViewModel.places.push(self.Venue);
-                                  console.log(self.Venue);
                               },
                               error: function(response) {
+                                ViewModel.error('Failed to get any results from Foursquare.');
+                                ViewModel.showFilterErrorList(true);
                                   console.log('error:', response);
                               }
                           });
                       }
                   },
                   error: function(response) {
-                      ViewModel.showPlace(false);
-                      ViewModel.showPlaceDetail(false);
+                      ViewModel.error('Failed to get any results from Foursquare.' );
                       ViewModel.showFilterErrorList(true);
-                      $('#fsq-errors').text('Failed to get any results from Foursquare: ' + response.statusText + ' (Status Code: ' + response.status + ')');
                       console.log('error: ', response);
                   }
               });
