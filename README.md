@@ -6,7 +6,7 @@ Single-page app built with Knockout.js using Google Maps API and Foursquare API.
 1. Clone or download the repo.
 2. Open index.html in your browser to view the app.
 3. Or, you can set up a local server following [these](https://developer.mozilla.org/en-US/docs/Learn/Common_questions/Set_up_a_basic_working_environment) instructions.
-4. View the app [here]().
+4. View the live app [here](http://food-explorer.surge.sh/).
 
 ## Project Brief
 You will develop a single page application featuring a map of your neighborhood or a neighborhood you would like to visit. You will then add functionality to this map including highlighted locations, third-party data about those locations and various ways to browse the content.
